@@ -1,0 +1,95 @@
+.carrinho {
+  max-width: 900px;
+  margin: 60px auto;
+  padding: 30px;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+}
+
+.carrinho h2 {
+  text-align: center;
+  color: var(--rosa);
+  margin-bottom: 30px;
+}
+
+.carrinho-item {
+  display: grid;
+  grid-template-columns: 80px 1fr auto;
+  align-items: center;
+  gap: 20px;
+  padding: 15px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.carrinho-item img {
+  width: 80px;
+}
+
+.carrinho-item h4 {
+  font-size: 16px;
+}
+
+.carrinho-item span {
+  font-weight: 600;
+}
+
+.carrinho-item button {
+  background: none;
+  border: none;
+  color: red;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.carrinho-total {
+  display: flex;
+  justify-content: space-between;
+  font-size: 20px;
+  margin: 25px 0;
+}
+
+.carrinho-botoes {
+  display: flex;
+  gap: 15px;
+}
+
+.btn-voltar,
+.btn-finalizar {
+  flex: 1;
+  padding: 14px;
+  border-radius: 30px;
+  text-align: center;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn-voltar {
+  background: #eee;
+  color: #333;
+}
+
+.btn-finalizar {
+  background: var(--rosa);
+  color: #fff;
+  border: none;
+}
+
+.btn-finalizar:hover {
+  opacity: 0.9;
+}
+
+.btn-limpar {
+  margin-top: 20px;
+  width: 100%;
+  padding: 12px;
+  border-radius: 30px;
+  background: #f2f2f2;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-limpar:hover {
+  background: #e0e0e0;
+}

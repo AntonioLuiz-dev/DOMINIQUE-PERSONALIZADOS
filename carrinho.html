@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Carrinho | Dominique Personalizados</title>
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="carrinho.css">
+</head>
+<body>
+
+  <section class="carrinho">
+    <h2>🛒 Meu Carrinho</h2>
+
+    <div id="carrinho-itens"></div>
+
+    <div class="carrinho-total">
+      <strong>Total:</strong>
+      <span id="total">R$ 0,00</span>
+    </div>
+
+    <div class="carrinho-botoes">
+      <a href="index.html#produtos" class="btn-voltar">
+        ← Continuar comprando
+      </a>
+
+      <button class="btn-finalizar" onclick="finalizarCompra()">
+        Finalizar compra
+      </button>
+    </div>
+
+    <button class="btn-limpar" onclick="limparCarrinho()">
+      🧹 Limpar carrinho
+    </button>
+  </section>
+
+  <div id="toast"></div>
+
+  <script src="carrinho.js"></script>
+</body>
+</html>

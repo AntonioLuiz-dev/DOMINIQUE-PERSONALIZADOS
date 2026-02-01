@@ -16,22 +16,21 @@
 .carrinho-item {
   display: grid;
   grid-template-columns: 80px 1fr auto;
-  align-items: center;
   gap: 20px;
+  align-items: center;
   padding: 15px 0;
   border-bottom: 1px solid #eee;
+  animation: fadeIn 0.4s ease;
+}
+
+.carrinho-item.removendo {
+  opacity: 0;
+  transform: translateX(20px);
+  transition: 0.4s;
 }
 
 .carrinho-item img {
   width: 80px;
-}
-
-.carrinho-item h4 {
-  font-size: 16px;
-}
-
-.carrinho-item span {
-  font-weight: 600;
 }
 
 .carrinho-item button {
@@ -45,8 +44,13 @@
 .carrinho-total {
   display: flex;
   justify-content: space-between;
-  font-size: 20px;
-  margin: 25px 0;
+  font-size: 18px;
+  margin: 20px 0;
+}
+
+.total-final {
+  font-size: 22px;
+  font-weight: bold;
 }
 
 .carrinho-botoes {
@@ -60,9 +64,8 @@
   padding: 14px;
   border-radius: 30px;
   text-align: center;
-  font-weight: 500;
-  text-decoration: none;
   cursor: pointer;
+  text-decoration: none;
 }
 
 .btn-voltar {
@@ -76,20 +79,69 @@
   border: none;
 }
 
-.btn-finalizar:hover {
-  opacity: 0.9;
-}
-
 .btn-limpar {
-  margin-top: 20px;
   width: 100%;
+  margin-top: 20px;
   padding: 12px;
   border-radius: 30px;
-  background: #f2f2f2;
   border: none;
   cursor: pointer;
 }
 
-.btn-limpar:hover {
-  background: #e0e0e0;
+/* 📦 FRETE */
+.frete-box {
+  margin: 25px 0;
+  padding: 20px;
+  background: #fafafa;
+  border-radius: 15px;
+}
+
+.frete-box h3 {
+  margin-bottom: 10px;
+}
+
+.frete-box input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
+}
+
+.frete-box button {
+  width: 100%;
+  padding: 12px;
+  border-radius: 20px;
+  border: none;
+  background: var(--rosa);
+  color: #fff;
+  cursor: pointer;
+}
+
+#frete-resultado {
+  margin-top: 10px;
+  font-weight: 500;
+}
+
+/* 🔔 TOAST */
+#toast {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: var(--rosa);
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 30px;
+  opacity: 0;
+  pointer-events: none;
+  transition: 0.4s;
+}
+
+#toast.show {
+  opacity: 1;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }

@@ -1,106 +1,84 @@
-# 🎈 Dominique Personalizados — Site Institucional & Catálogo Interativo
+🧁 Dominique Personalizados – E-commerce Front-end
 
-Projeto de **site institucional com catálogo e carrinho interativo**, desenvolvido para a marca **Dominique Personalizados**, focada em papelaria personalizada para festas e datas especiais.
+Projeto de e-commerce desenvolvido com foco em experiência do usuário, organização de código e simulação de funcionalidades reais, como carrinho de compras e cálculo de frete.
 
-O objetivo do projeto foi unir **design moderno**, **experiência do usuário** e **lógica de negócio**, utilizando apenas **tecnologias web fundamentais**, sem frameworks, demonstrando domínio sólido de front-end.
+Este projeto foi criado para fins de portfólio, demonstrando boas práticas de front-end e integração com serviços externos.
 
----
+✨ Demonstração
 
-## 🎯 Objetivo do Projeto
+🔗 Acesse o projeto online:
+https://antonioluiz-dev.github.io/DOMINIQUE-PERSONALIZADOS/
 
-- Criar uma presença digital profissional para um pequeno negócio
-- Facilitar a visualização dos produtos por categoria
-- Simular um fluxo real de compra com carrinho
-- Direcionar a finalização do pedido para o WhatsApp
-- Desenvolver um código limpo, organizado e de fácil manutenção
+🛍️ Funcionalidades
 
----
+Catálogo de produtos por categoria
 
-## 🧠 Conceitos Aplicados
+Carrinho de compras persistente (LocalStorage)
 
-- Estrutura semântica com **HTML5**
-- Layout moderno com **CSS3**
-  - Glassmorphism
-  - Animações suaves
-  - Responsividade
-- **JavaScript puro (Vanilla JS)** para lógica da aplicação
-- Persistência de dados com **LocalStorage**
-- Feedback visual para ações do usuário (UX/UI)
-- Organização de código pensando em escalabilidade
+Adição e remoção de produtos com animações
 
----
+Badge de quantidade no carrinho
 
-## ✨ Funcionalidades Principais
+Cálculo de frete em tempo real (simulação)
 
-### 📦 Catálogo de Produtos
-- Produtos organizados por categorias
-- Renderização dinâmica via JavaScript
-- Estrutura preparada para fácil adição de novos itens
+Total atualizado automaticamente
 
-### 🛒 Carrinho de Compras
-- Adição e remoção de produtos
-- Controle de quantidade
-- Badge animado indicando itens no carrinho
-- Persistência dos dados mesmo após recarregar a página
-- Animações ao adicionar/remover produtos
-- Feedback visual com *toast notifications*
+Finalização de pedido via WhatsApp
 
-### 📲 Finalização Inteligente
-- Envio automático do pedido formatado para o WhatsApp
-- Atendimento humanizado sem necessidade de backend
+Design responsivo (mobile e desktop)
 
----
+UI moderna e amigável
 
-## 🛠️ Tecnologias Utilizadas
+🧰 Tecnologias Utilizadas
 
-- **HTML5**
-- **CSS3**
-- **JavaScript (ES6+)**
-- **LocalStorage**
-- **Font Awesome**
-- **Google Fonts / CDN Fonts**
+HTML5
 
-> ⚠️ Projeto desenvolvido **sem frameworks**, com foco em base sólida de front-end.
+CSS3 (Flexbox e Grid)
 
----
+JavaScript (Vanilla JS)
 
-🌐 Responsividade
+LocalStorage
 
-O site foi desenvolvido com foco em:
+Integração com API externa (ViaCEP)
 
-Desktop
+Simulação de backend (JSON)
 
-Tablets
+📦 Cálculo de Frete
 
-Smartphones
+O cálculo de frete é feito de forma simulada, utilizando:
 
-Garantindo uma experiência consistente em diferentes tamanhos de tela.
+Validação real de CEP
 
-🚀 Possíveis Evoluções Futuras
+Lógica de cálculo dinâmica
 
-Integração com backend (Node.js / API REST)
+Exibição de prazo e valor
 
-Autenticação de usuários
+Em um cenário real, essa funcionalidade seria integrada a uma API oficial de transportadora ou Correios via backend.
 
-Dashboard administrativo
+🧪 Backend Fake (Simulação)
 
-Integração com gateway de pagamento
+Para simular um backend real, os produtos são estruturados em um arquivo JavaScript/JSON, permitindo fácil manutenção e escalabilidade.
 
-Migração para React
+Essa abordagem é muito utilizada em:
 
-👨‍💻 Desenvolvedor
+MVPs
+
+Protótipos
+
+Testes de front-end
+
+Portfólios profissionais
+
+👨‍💻 Autor
 
 Antonio Luiz Santos
-Desenvolvedor Front-end em transição para Full Stack
-Foco em aplicações web modernas, acessíveis e bem estruturadas.
+Desenvolvedor Front-end em transição de carreira 🚀
 
-📌 GitHub: https://github.com/antonioluiz-dev
+📧 Contato: antonioluiz.dev@outlook.com
+💼 LinkedIn: https://www.linkedin.com/in/antonio-luiz-dos-santos/
+🐙 GitHub: https://github.com/AntonioLuiz-dev
 
-💬 Considerações Finais
-
-Este projeto demonstra domínio de fundamentos do front-end, preocupação com UX/UI e capacidade de transformar uma necessidade real de negócio em uma solução funcional e escalável.
-
-Desenvolvido com atenção aos detalhes, clareza de código e foco em experiência do usuário.
+⭐ Se você gostou do projeto, não esqueça de deixar uma estrela!
 
 ## 📱💻 Preview do Projeto
 <br>

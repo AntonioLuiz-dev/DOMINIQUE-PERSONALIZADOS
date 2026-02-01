@@ -15,7 +15,28 @@
     <div id="carrinho-itens"></div>
 
     <div class="carrinho-total">
-      <strong>Total:</strong>
+      <strong>Subtotal:</strong>
+      <span id="subtotal">R$ 0,00</span>
+    </div>
+
+    <!-- 📦 FRETE -->
+    <div class="frete-box">
+      <h3>📦 Calcular Frete</h3>
+
+      <input 
+        type="text" 
+        id="cep" 
+        placeholder="Digite seu CEP"
+        maxlength="9"
+      >
+
+      <button onclick="calcularFrete()">Calcular</button>
+
+      <div id="frete-resultado"></div>
+    </div>
+
+    <div class="carrinho-total total-final">
+      <strong>Total com frete:</strong>
       <span id="total">R$ 0,00</span>
     </div>
 

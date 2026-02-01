@@ -104,4 +104,4 @@ Desenvolvido com atenção aos detalhes, clareza de código e foco em experiênc
 
 ## 📱💻 Preview do Projeto
 <br>
-<img src="https://github.com/AntonioLuiz-dev/CALCULADORA/blob/main/assets/mockup.png?raw=true"500px"/>
+<img src="https://github.com/AntonioLuiz-dev/DOMINIQUE-PERSONALIZADOS/blob/main/img/SITE%20DOMINIQUE%20PERSONALIZADOS.png?raw=true"500px"/>

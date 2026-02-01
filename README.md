@@ -101,3 +101,7 @@ Foco em aplicações web modernas, acessíveis e bem estruturadas.
 Este projeto demonstra domínio de fundamentos do front-end, preocupação com UX/UI e capacidade de transformar uma necessidade real de negócio em uma solução funcional e escalável.
 
 Desenvolvido com atenção aos detalhes, clareza de código e foco em experiência do usuário.
+
+## 📱💻 Preview do Projeto
+<br>
+<img src="https://github.com/AntonioLuiz-dev/CALCULADORA/blob/main/assets/mockup.png?raw=true"500px"/>

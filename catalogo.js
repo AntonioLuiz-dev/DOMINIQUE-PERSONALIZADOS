@@ -1,32 +1,15 @@
 // =======================================================================
 // 📦 COMO ADICIONAR PRODUTOS AO CATÁLOGO
 // =======================================================================
+// Os produtos agora podem ser gerenciados pelo Painel Admin (admin.html)
+// sem precisar editar este arquivo.
 //
-// 1. Coloque a imagem do produto na pasta  img/
-//    Exemplo: salve o arquivo como  img/topo-unicornio.png
-//
-// 2. Adicione um novo objeto dentro da categoria correta abaixo.
-//    Copie e cole este modelo dentro do array da categoria desejada:
-//
-//    {
-//      id: 99,                              ← número único, não repita
-//      nome: "Nome do Produto",
-//      descricao: "Descrição curta.",
-//      preco: 35.00,                        ← use ponto como separador decimal
-//      imagem: "img/nome-do-arquivo.png"    ← caminho da imagem na pasta img/
-//    }
-//
-// 3. Salve o arquivo. O produto já aparece no catálogo automaticamente.
-//
-// ✅ CATEGORIAS DISPONÍVEIS:
-//    topos      → Topos de Bolo
-//    tematica   → Kit Festa
-//    afetiva    → Papelaria Afetiva
-//    brindes    → Brindes Personalizados
-//    centros    → Centros de Mesa
+// Se preferir editar aqui diretamente, adicione dentro do array correto.
+// Os produtos salvos no painel admin têm prioridade sobre os daqui.
 // =======================================================================
 
-const produtos = {
+// Produtos padrão — usados apenas se o painel admin não tiver nada salvo
+const PRODUTOS_PADRAO = {
 
   // ─── 🎉 TOPOS DE BOLO ───────────────────────────────────────────────
   topos: [
@@ -37,7 +20,6 @@ const produtos = {
       preco: 35.00,
       imagem: "img/produto-exemplo.png"
     },
-    // ← ADICIONE MAIS TOPOS AQUI
   ],
 
   // ─── 🎈 KIT FESTA ───────────────────────────────────────────────────
@@ -56,7 +38,6 @@ const produtos = {
       preco: 105.00,
       imagem: "img/sereia-lilas.jpeg"
     },
-    // ← ADICIONE MAIS KITS FESTA AQUI
   ],
 
   // ─── 💖 PAPELARIA AFETIVA ───────────────────────────────────────────
@@ -68,7 +49,6 @@ const produtos = {
       preco: 55.00,
       imagem: "img/kit-dinossauro.jpeg"
     },
-    // ← ADICIONE MAIS AFETIVOS AQUI
   ],
 
   // ─── 🎀 BRINDES PERSONALIZADOS ──────────────────────────────────────
@@ -94,7 +74,6 @@ const produtos = {
       preco: 65.00,
       imagem: "img/saco-ziplock.jpeg"
     },
-    // ← ADICIONE MAIS BRINDES AQUI
   ],
 
   // ─── 🌸 CENTROS DE MESA ─────────────────────────────────────────────
@@ -106,7 +85,6 @@ const produtos = {
       preco: 45.00,
       imagem: "img/produto-exemplo.png"
     },
-    // ← ADICIONE MAIS CENTROS DE MESA AQUI
   ]
 };
 
@@ -114,7 +92,15 @@ const produtos = {
 // ⚙️  A PARTIR DAQUI NÃO É NECESSÁRIO EDITAR
 // =======================================================================
 
-// ─── LIGHTBOX (expansão de imagem) ──────────────────────────────────────
+// Lê produtos do painel admin (localStorage); usa padrão como fallback
+function getProdutos() {
+  const salvo = localStorage.getItem("produtos_admin");
+  return salvo ? JSON.parse(salvo) : PRODUTOS_PADRAO;
+}
+
+const produtos = getProdutos();
+
+// ─── LIGHTBOX ────────────────────────────────────────────────────────────
 function criarLightbox() {
   const overlay = document.createElement("div");
   overlay.id = "lightbox-overlay";
@@ -127,72 +113,44 @@ function criarLightbox() {
   `;
 
   overlay.style.cssText = `
-    position: fixed;
-    inset: 0;
+    position: fixed; inset: 0;
     background: rgba(0,0,0,0.82);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    cursor: zoom-out;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 9999; opacity: 0;
+    transition: opacity 0.3s ease; cursor: zoom-out;
   `;
 
   const container = overlay.querySelector("#lightbox-container");
   container.style.cssText = `
-    position: relative;
-    max-width: 90vw;
-    max-height: 90vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 14px;
-    cursor: default;
+    position: relative; max-width: 90vw; max-height: 90vh;
+    display: flex; flex-direction: column; align-items: center;
+    gap: 14px; cursor: default;
   `;
 
   const img = overlay.querySelector("#lightbox-img");
   img.style.cssText = `
-    max-width: 90vw;
-    max-height: 78vh;
-    object-fit: contain;
-    border-radius: 18px;
-    box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+    max-width: 90vw; max-height: 78vh; object-fit: contain;
+    border-radius: 18px; box-shadow: 0 30px 80px rgba(0,0,0,0.6);
     transform: scale(0.92);
     transition: transform 0.35s cubic-bezier(0.22,1,0.36,1);
   `;
 
   const nome = overlay.querySelector("#lightbox-nome");
   nome.style.cssText = `
-    color: #fff;
-    font-size: 16px;
-    font-weight: 500;
-    letter-spacing: 0.3px;
-    text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    color: #fff; font-size: 16px; font-weight: 500;
+    letter-spacing: 0.3px; text-shadow: 0 2px 8px rgba(0,0,0,0.5);
   `;
 
   const btnFechar = overlay.querySelector("#lightbox-fechar");
   btnFechar.style.cssText = `
-    position: absolute;
-    top: -18px;
-    right: -18px;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    border: none;
-    background: #D96C8A;
-    color: #fff;
-    font-size: 18px;
-    font-weight: bold;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    position: absolute; top: -18px; right: -18px;
+    width: 40px; height: 40px; border-radius: 50%; border: none;
+    background: #D96C8A; color: #fff; font-size: 18px; font-weight: bold;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
     box-shadow: 0 4px 16px rgba(217,108,138,0.5);
-    transition: transform 0.2s, background 0.2s;
-    z-index: 1;
+    transition: transform 0.2s, background 0.2s; z-index: 1;
   `;
 
   btnFechar.addEventListener("mouseenter", () => {
@@ -205,16 +163,9 @@ function criarLightbox() {
   });
 
   document.body.appendChild(overlay);
-
-  overlay.addEventListener("click", (e) => {
-    if (e.target === overlay) fecharLightbox();
-  });
-
+  overlay.addEventListener("click", e => { if (e.target === overlay) fecharLightbox(); });
   btnFechar.addEventListener("click", fecharLightbox);
-
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") fecharLightbox();
-  });
+  document.addEventListener("keydown", e => { if (e.key === "Escape") fecharLightbox(); });
 
   return overlay;
 }
@@ -223,14 +174,11 @@ let lightbox = null;
 
 function abrirLightbox(src, nome) {
   if (!lightbox) lightbox = criarLightbox();
-
   const img    = lightbox.querySelector("#lightbox-img");
   const nomeEl = lightbox.querySelector("#lightbox-nome");
-
-  img.src            = src;
+  img.src = src;
   nomeEl.textContent = nome;
   document.body.style.overflow = "hidden";
-
   lightbox.style.display = "flex";
   requestAnimationFrame(() => {
     lightbox.style.opacity = "1";
@@ -240,18 +188,14 @@ function abrirLightbox(src, nome) {
 
 function fecharLightbox() {
   if (!lightbox) return;
-
   const img = lightbox.querySelector("#lightbox-img");
   lightbox.style.opacity = "0";
   img.style.transform    = "scale(0.92)";
   document.body.style.overflow = "";
-
-  setTimeout(() => {
-    lightbox.style.display = "none";
-  }, 300);
+  setTimeout(() => { lightbox.style.display = "none"; }, 300);
 }
 
-// ─── RENDERIZAÇÃO ────────────────────────────────────────────────────────
+// ─── RENDERIZAÇÃO ─────────────────────────────────────────────────────────
 const params    = new URLSearchParams(window.location.search);
 const categoria = params.get("categoria") || "topos";
 
@@ -306,22 +250,18 @@ function adicionarCarrinho(produto, card) {
   let carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
   carrinho.push({ ...produto, quantidade: 1 });
   localStorage.setItem("carrinho", JSON.stringify(carrinho));
-
   card.classList.add("produto-animado");
   setTimeout(() => card.classList.remove("produto-animado"), 400);
-
   mostrarToast("Produto adicionado ao carrinho 🛒✨");
 }
 
 function mostrarToast(msg) {
   let toast = document.getElementById("toast");
-
   if (!toast) {
     toast = document.createElement("div");
     toast.id = "toast";
     document.body.appendChild(toast);
   }
-
   toast.textContent = msg;
   toast.classList.add("show");
   setTimeout(() => toast.classList.remove("show"), 2500);

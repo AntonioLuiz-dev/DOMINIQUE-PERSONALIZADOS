@@ -3,9 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <title>Carrinho | Dominique Personalizados</title>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="./img/favicon.ico">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="carrinho.css">
+  <!-- QR Code gerado localmente no browser — sem API externa -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
 
@@ -22,41 +26,81 @@
     <!-- 📦 FRETE -->
     <div class="frete-box">
       <h3>📦 Calcular Frete</h3>
-
-      <input 
-        type="text" 
-        id="cep" 
-        placeholder="Digite seu CEP"
-        maxlength="9"
-      >
-
+      <input type="text" id="cep" placeholder="Digite seu CEP" maxlength="9">
       <button onclick="calcularFrete()">Calcular</button>
-
       <div id="frete-resultado"></div>
     </div>
 
+    <!-- 💳 PAGAMENTO -->
+    <div class="pagamento-box" id="pagamento-box" style="display:none">
+      <h3>💳 Forma de Pagamento</h3>
+
+      <div class="pagamento-opcoes">
+        <button class="opcao-pagamento" id="btn-pix" onclick="selecionarPagamento('pix')">
+          <span class="opcao-icon">⚡</span>
+          <span class="opcao-label">PIX</span>
+          <span class="opcao-desc">10% de desconto</span>
+        </button>
+        <button class="opcao-pagamento" id="btn-cartao" onclick="selecionarPagamento('cartao')">
+          <span class="opcao-icon">💳</span>
+          <span class="opcao-label">Cartão de Crédito</span>
+          <span class="opcao-desc">Parcelamento disponível</span>
+        </button>
+      </div>
+
+      <!-- PIX DETALHES -->
+      <div class="pix-detalhes" id="pix-detalhes" style="display:none">
+        <div class="desconto-badge">🎉 10% de desconto aplicado!</div>
+
+        <div class="total-com-desconto">
+          <span>Total com desconto:</span>
+          <strong id="total-pix">R$ 0,00</strong>
+        </div>
+
+        <div class="pix-instrucoes">
+          <p>Escaneie o QR Code ou copie a chave PIX abaixo:</p>
+
+          <div class="qr-wrapper">
+            <!-- QR gerado via JS aqui -->
+            <div id="qr-code-container"></div>
+          </div>
+
+          <div class="pix-chave-box">
+            <span class="pix-chave-label">Chave PIX (CPF):</span>
+            <div class="pix-chave-row">
+              <code id="pix-chave-texto"></code>
+              <button class="btn-copiar" onclick="copiarChavePix()">📋 Copiar</button>
+            </div>
+          </div>
+
+          <p class="pix-aviso">⚠️ Após o pagamento, envie o comprovante pelo WhatsApp para confirmar seu pedido.</p>
+        </div>
+      </div>
+
+      <!-- CARTÃO DETALHES -->
+      <div class="cartao-detalhes" id="cartao-detalhes" style="display:none">
+        <p class="cartao-info">Você será redirecionado para nossa plataforma segura de pagamento com cartão de crédito.</p>
+        <div class="total-cartao">
+          <span>Total:</span>
+          <strong id="total-cartao-val">R$ 0,00</strong>
+        </div>
+      </div>
+    </div>
+
     <div class="carrinho-total total-final">
-      <strong>Total com frete:</strong>
+      <strong>Total:</strong>
       <span id="total">R$ 0,00</span>
     </div>
 
     <div class="carrinho-botoes">
-      <a href="index.html#produtos" class="btn-voltar">
-        ← Continuar comprando
-      </a>
-
-      <button class="btn-finalizar" onclick="finalizarCompra()">
-        Finalizar compra
-      </button>
+      <a href="index.html#produtos" class="btn-voltar">← Continuar comprando</a>
+      <button class="btn-finalizar" onclick="finalizarCompra()">Finalizar compra</button>
     </div>
 
-    <button class="btn-limpar" onclick="limparCarrinho()">
-      🧹 Limpar carrinho
-    </button>
+    <button class="btn-limpar" onclick="limparCarrinho()">🧹 Limpar carrinho</button>
   </section>
 
   <div id="toast"></div>
-
   <script src="carrinho.js"></script>
 </body>
 </html>

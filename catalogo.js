@@ -20,9 +20,7 @@
 //
 // ✅ CATEGORIAS DISPONÍVEIS:
 //    topos      → Topos de Bolo
-//    caixinhas  → Caixinhas
-//    kits       → Kits Festa
-//    tematica   → Papelaria Temática
+//    tematica   → Kit Festa
 //    afetiva    → Papelaria Afetiva
 //    brindes    → Brindes Personalizados
 //    centros    → Centros de Mesa
@@ -42,31 +40,7 @@ const produtos = {
     // ← ADICIONE MAIS TOPOS AQUI
   ],
 
-  // ─── 🎁 CAIXINHAS ───────────────────────────────────────────────────
-  caixinhas: [
-    {
-      id: 2,
-      nome: "Caixinha Personalizada",
-      descricao: "Caixinhas decorativas para lembrancinhas de festa.",
-      preco: 25.00,
-      imagem: "img/produto-exemplo.png"
-    },
-    // ← ADICIONE MAIS CAIXINHAS AQUI
-  ],
-
-  // ─── 📦 KITS FESTA ──────────────────────────────────────────────────
-  kits: [
-    {
-      id: 3,
-      nome: "Kit Festa Completo",
-      descricao: "Kit com topo, caixinhas e papelaria temática.",
-      preco: 120.00,
-      imagem: "img/produto-exemplo.png"
-    },
-    // ← ADICIONE MAIS KITS AQUI
-  ],
-
-  // ─── 🎈 PAPELARIA TEMÁTICA ──────────────────────────────────────────
+  // ─── 🎈 KIT FESTA ───────────────────────────────────────────────────
   tematica: [
     {
       id: 4,
@@ -75,23 +49,14 @@ const produtos = {
       preco: 50.00,
       imagem: "img/maleta-de-acetato.jpeg"
     },
-    
     {
       id: 4.1,
-      nome: "Saco Ziplock",
-      descricao: "Saco Ziplock ✨ Adesivado por inteiro na parte frontal, de acordo com o tema da festa. Acompanha tag dupla personalizada. Medida: 10x15 cm. 📦 O kit contém 10 unidades. Perfeito para compor a mesa principal e encantar seus convidados!",
-      preco: 65.00,
-      imagem: "img/saco-ziplock.jpeg"
-    },
-
-    {
-      id: 4.2,
       nome: "Sereia Lilás",
       descricao: "Personalizados Sereia Lilás ✨ Caixas clássicas personalizadas no tema Sereia. Neste modelo, o kit contém 3 formatos de caixas: Milk, Cone e Baú. 📦 O kit contém: 5 caixas Milk / 5 caixas Cone / 5 caixas Baú. Perfeito para compor a mesa principal e encantar seus convidados!",
       preco: 105.00,
       imagem: "img/sereia-lilas.jpeg"
     },
-    // ← ADICIONE MAIS TEMÁTICOS AQUI
+    // ← ADICIONE MAIS KITS FESTA AQUI
   ],
 
   // ─── 💖 PAPELARIA AFETIVA ───────────────────────────────────────────
@@ -121,6 +86,13 @@ const produtos = {
       descricao: "Tubolata com tampa de plástico ✨ Produzida seguindo a paleta de cores da festa, com nome e idade da criança, trazendo ainda mais harmonia e encanto para a decoração. Neste modelo, a personalização é adesiva e acompanha laço modelo gravata. 📦 O kit contém 10 tubolatas personalizadas. Perfeita para compor a mesa principal ou encantar seus convidados!",
       preco: 60.00,
       imagem: "img/tubolata-tampa-plastica.jpeg"
+    },
+    {
+      id: 6.2,
+      nome: "Saco Ziplock",
+      descricao: "Saco Ziplock ✨ Adesivado por inteiro na parte frontal, de acordo com o tema da festa. Acompanha tag dupla personalizada. Medida: 10x15 cm. 📦 O kit contém 10 unidades. Perfeito para compor a mesa principal e encantar seus convidados!",
+      preco: 65.00,
+      imagem: "img/saco-ziplock.jpeg"
     },
     // ← ADICIONE MAIS BRINDES AQUI
   ],
@@ -284,13 +256,11 @@ const params    = new URLSearchParams(window.location.search);
 const categoria = params.get("categoria") || "topos";
 
 const nomesCategorias = {
-  topos:     "Topos de Bolo",
-  caixinhas: "Caixinhas",
-  kits:      "Kits Festa",
-  tematica:  "Papelaria Temática",
-  afetiva:   "Papelaria Afetiva",
-  brindes:   "Brindes Personalizados",
-  centros:   "Centros de Mesa"
+  topos:    "Topos de Bolo",
+  tematica: "Kit Festa",
+  afetiva:  "Papelaria Afetiva",
+  brindes:  "Brindes Personalizados",
+  centros:  "Centros de Mesa"
 };
 
 document.getElementById("titulo-catalogo").innerText =

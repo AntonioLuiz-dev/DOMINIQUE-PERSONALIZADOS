@@ -17,6 +17,21 @@
 
   <!-- CSS -->
   <link rel="stylesheet" href="style.css">
+
+  <style>
+    /* Centraliza os cards de produtos com largura máxima proporcional */
+    .produtos-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 30px;
+      margin-top: 30px;
+    }
+
+    .produtos-container .produto-card {
+      flex: 0 1 220px;
+    }
+  </style>
 </head>
 <body>
 
@@ -87,13 +102,11 @@
 <section id="produtos">
   <h2>Nossos Produtos</h2>
   <div class="produtos-container">
-    <a href="catalogo.html?categoria=topos" class="produto-card"><span>🎉</span><h3>Topos de Bolo</h3></a>
-    <a href="catalogo.html?categoria=caixinhas" class="produto-card"><span>🎁</span><h3>Caixinhas</h3></a>
-    <a href="catalogo.html?categoria=kits" class="produto-card"><span>📦</span><h3>Kits Festa</h3></a>
-    <a href="catalogo.html?categoria=tematica" class="produto-card"><span>🎈</span><h3>Papelaria Temática</h3></a>
-    <a href="catalogo.html?categoria=afetiva" class="produto-card"><span>💖</span><h3>Papelaria Afetiva</h3></a>
-    <a href="catalogo.html?categoria=brindes" class="produto-card"><span>🎀</span><h3>Brindes Personalizados</h3></a>
-    <a href="catalogo.html?categoria=centros" class="produto-card"><span>🌸</span><h3>Centros de Mesa</h3></a>
+    <a href="catalogo.html?categoria=topos"    class="produto-card"><span>🎉</span><h3>Topos de Bolo</h3></a>
+    <a href="catalogo.html?categoria=tematica" class="produto-card"><span>🎈</span><h3>Kit Festa</h3></a>
+    <a href="catalogo.html?categoria=afetiva"  class="produto-card"><span>💖</span><h3>Papelaria Afetiva</h3></a>
+    <a href="catalogo.html?categoria=brindes"  class="produto-card"><span>🎀</span><h3>Brindes Personalizados</h3></a>
+    <a href="catalogo.html?categoria=centros"  class="produto-card"><span>🌸</span><h3>Centros de Mesa</h3></a>
   </div>
 </section>
 

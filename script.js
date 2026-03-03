@@ -1,15 +1,56 @@
 // ===== FORM CONTATO =====
-document.getElementById("form-contato").addEventListener("submit", e => {
-  e.preventDefault();
-  const nome     = document.getElementById("nome").value;
-  const email    = document.getElementById("email").value;
-  const mensagem = document.getElementById("mensagem").value;
+// EmailJS — substitua os valores abaixo com os seus (veja instrucoes no README)
+const EMAILJS_SERVICE_ID  = "service_xryre6z";
+const EMAILJS_TEMPLATE_ID = "template_08e99qk";
+const EMAILJS_PUBLIC_KEY  = "CkejzIdfj3Y78LCnH";
 
-  window.location.href =
-    `mailto:dominiquepersonalizados@gmail.com?subject=Contato&body=${encodeURIComponent(
-      `Nome: ${nome}\nEmail: ${email}\n\n${mensagem}`
-    )}`;
+document.getElementById("form-contato").addEventListener("submit", async function(e) {
+  e.preventDefault();
+
+  const nome     = document.getElementById("nome").value.trim();
+  const email    = document.getElementById("email").value.trim();
+  const mensagem = document.getElementById("mensagem").value.trim();
+  const btn      = this.querySelector("button[type='submit']");
+
+  if (!nome || !email || !mensagem) return;
+
+  btn.textContent = "Enviando...";
+  btn.disabled    = true;
+
+  let emailOk = false;
+
+  try {
+    await emailjs.send(
+      EMAILJS_SERVICE_ID,
+      EMAILJS_TEMPLATE_ID,
+      {
+        from_name:  nome,
+        from_email: email,
+        message:    mensagem,
+        reply_to:   email
+      },
+      EMAILJS_PUBLIC_KEY
+    );
+    emailOk = true;
+  } catch (err) {
+    console.warn("EmailJS erro:", err);
+  }
+
+  // Abre WhatsApp em nova aba simultaneamente
+  const textoWpp = "Ola! Me chamo " + nome + " (" + email + ").\n\n" + mensagem;
+  window.open("https://wa.me/5521983394115?text=" + encodeURIComponent(textoWpp), "_blank");
+
+  if (emailOk) {
+    mostrarToast("Mensagem enviada com sucesso! Em breve entraremos em contato 💖");
+  } else {
+    mostrarToast("Mensagem enviada pelo WhatsApp! 💬");
+  }
+
+  this.reset();
+  btn.textContent = "Enviar mensagem";
+  btn.disabled    = false;
 });
+
 
 // ===== MENU MOBILE =====
 const menuToggle = document.getElementById("menu-toggle");

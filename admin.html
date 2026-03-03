@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <title>Admin | Dominique Personalizados</title>
@@ -8,22 +9,33 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="admin.css">
 </head>
+
 <body>
 
   <!-- ===== LOGIN ===== -->
   <div id="login-screen">
     <div class="login-card">
       <div class="login-logo">
-        <span>🌸</span>
+        <!-- Troque o src abaixo pela foto ou logo desejada -->
+        <img id="logo-admin-img" src="./img/mascote.png" alt="Logo"
+          onerror="this.style.display='none'; document.getElementById('logo-admin-emoji').style.display='block'">
+        <span id="logo-admin-emoji" style="display:none; font-size:48px;">🌸</span>
         <h1>Dominique</h1>
         <p>Painel Administrativo</p>
       </div>
       <div class="login-form">
-        <label>Senha de acesso</label>
+        <label>E-mail</label>
         <div class="input-group">
-          <input type="password" id="senha-input" placeholder="Digite sua senha" autocomplete="off">
+          <input type="email" id="email-input" placeholder="seu@email.com" autocomplete="email">
+          <span class="input-icon"><i class="fa fa-envelope"></i></span>
+        </div>
+
+        <label>Senha</label>
+        <div class="input-group">
+          <input type="password" id="senha-input" placeholder="Sua senha" autocomplete="current-password">
           <button id="toggle-senha" type="button"><i class="fa fa-eye"></i></button>
         </div>
+
         <button id="btn-login" onclick="fazerLogin()">Entrar</button>
         <p id="login-erro" class="erro-msg"></p>
       </div>
@@ -33,10 +45,13 @@
   <!-- ===== PAINEL ===== -->
   <div id="painel" style="display:none">
 
-    <!-- Sidebar -->
     <aside class="sidebar">
       <div class="sidebar-logo">
-        <span>🌸</span>
+        <!-- Troque o src abaixo pela foto ou logo desejada -->
+        <img id="sidebar-logo-img" src="./img/mascote.png" alt="Logo"
+          onerror="this.style.display='none'; document.getElementById('sidebar-logo-emoji').style.display='block'"
+          style="width:42px; height:42px; border-radius:50%; object-fit:cover; border:2px solid #fce4ec;">
+        <span id="sidebar-logo-emoji" style="display:none; font-size:28px;">🌸</span>
         <div>
           <strong>Dominique</strong>
           <small>Administrador</small>
@@ -51,7 +66,7 @@
           <i class="fa fa-plus-circle"></i> Adicionar Produto
         </button>
         <button class="nav-btn" onclick="mostrarAba('visitas')">
-          <i class="fa fa-chart-bar"></i> Visitas
+          <i class="fa fa-chart-bar"></i> Estatísticas
         </button>
       </nav>
 
@@ -65,24 +80,21 @@
       </div>
     </aside>
 
-    <!-- Conteúdo principal -->
     <main class="main-content">
 
-      <!-- ── ABA: CATÁLOGO ── -->
+      <!-- ABA CATÁLOGO -->
       <div id="aba-catalogo" class="aba">
         <div class="page-header">
           <h2>📦 Gerenciar Catálogo</h2>
           <span class="badge" id="total-produtos-badge">0 produtos</span>
         </div>
-
-        <!-- Filtro por categoria -->
         <div class="categoria-tabs" id="categoria-tabs"></div>
-
-        <!-- Grid de produtos -->
-        <div class="produtos-admin-grid" id="produtos-admin-grid"></div>
+        <div class="produtos-admin-grid" id="produtos-admin-grid">
+          <div class="vazio-msg">Carregando produtos... ⏳</div>
+        </div>
       </div>
 
-      <!-- ── ABA: ADICIONAR ── -->
+      <!-- ABA ADICIONAR -->
       <div id="aba-adicionar" class="aba" style="display:none">
         <div class="page-header">
           <h2>➕ Adicionar Produto</h2>
@@ -113,15 +125,19 @@
 
           <div class="form-group">
             <label>Descrição *</label>
-            <textarea id="form-descricao" rows="4" placeholder="Descreva o produto, quantidade do kit, medidas, etc."></textarea>
+            <textarea id="form-descricao" rows="4"
+              placeholder="Descreva o produto, quantidade do kit, medidas, etc."></textarea>
           </div>
 
+          <!-- IMAGEM -->
           <div class="form-group">
             <label>Imagem do Produto *</label>
+
             <div class="imagem-opcoes">
               <label class="radio-label">
-                <input type="radio" name="tipo-imagem" value="arquivo" checked onchange="alternarTipoImagem(this.value)">
-                📁 Arquivo local (pasta img/)
+                <input type="radio" name="tipo-imagem" value="arquivo" checked
+                  onchange="alternarTipoImagem(this.value)">
+                📁 Pasta img/
               </label>
               <label class="radio-label">
                 <input type="radio" name="tipo-imagem" value="url" onchange="alternarTipoImagem(this.value)">
@@ -129,11 +145,13 @@
               </label>
             </div>
 
+            <!-- Caminho local img/ -->
             <div id="input-arquivo">
               <input type="text" id="form-imagem-arquivo" placeholder="img/nome-do-arquivo.jpg">
               <small>💡 Salve a imagem na pasta <code>img/</code> do projeto e informe o nome aqui.</small>
             </div>
 
+            <!-- URL externa -->
             <div id="input-url" style="display:none">
               <input type="text" id="form-imagem-url" placeholder="https://exemplo.com/imagem.jpg">
             </div>
@@ -151,21 +169,18 @@
             <button onclick="salvarProduto()" class="btn-salvar">
               <i class="fa fa-check"></i> Salvar Produto
             </button>
-            <button onclick="limparFormulario()" class="btn-cancelar">
-              Limpar
-            </button>
+            <button onclick="limparFormulario()" class="btn-cancelar">Limpar</button>
           </div>
 
           <p id="form-msg" class="form-msg"></p>
         </div>
       </div>
 
-      <!-- ── ABA: VISITAS ── -->
+      <!-- ABA ESTATÍSTICAS -->
       <div id="aba-visitas" class="aba" style="display:none">
         <div class="page-header">
-          <h2>📊 Estatísticas de Visitas</h2>
+          <h2>📊 Estatísticas</h2>
         </div>
-
         <div class="stats-grid">
           <div class="stat-card">
             <span class="stat-icon">👁️</span>
@@ -189,18 +204,15 @@
             </div>
           </div>
         </div>
-
         <div class="reset-visitas">
-          <button onclick="resetarVisitas()" class="btn-reset">
-            🔄 Zerar contador de visitas
-          </button>
+          <button onclick="resetarVisitas()" class="btn-reset">🔄 Zerar contador de visitas</button>
         </div>
       </div>
 
     </main>
   </div>
 
-  <!-- Modal de confirmação de exclusão -->
+  <!-- Modal exclusão -->
   <div id="modal-confirmar" style="display:none">
     <div class="modal-box">
       <h3>🗑️ Remover produto?</h3>
@@ -215,6 +227,7 @@
 
   <div id="toast-admin"></div>
 
-  <script src="admin.js"></script>
+  <script type="module" src="admin.js"></script>
 </body>
+
 </html>

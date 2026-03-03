@@ -1,29 +1,19 @@
-// =======================================================================
-// CONFIGURACAO — altere a senha aqui
-// =======================================================================
-const SENHA_ADMIN = "dominique2026"; // Mude para sua senha preferida
-// =======================================================================
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+import { getFirestore, collection, doc, setDoc, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
 
-const PRODUTOS_PADRAO = {
-  topos: [
-    { id: 1, nome: "Topo de Bolo Personalizado", descricao: "Topo em papel fotografico com nome e arte a sua escolha.", preco: 35.00, imagem: "img/produto-exemplo.png" }
-  ],
-  tematica: [
-    { id: 4, nome: "Maleta de Acetato", descricao: "Maleta em acetato produzida de acordo com o tema da festa. O kit contem 3 unidades.", preco: 50.00, imagem: "img/maleta-de-acetato.jpeg" },
-    { id: 5, nome: "Sereia Lilas", descricao: "Personalizados Sereia Lilas. O kit contem: 5 caixas Milk / 5 caixas Cone / 5 caixas Bau.", preco: 105.00, imagem: "img/sereia-lilas.jpeg" }
-  ],
-  afetiva: [
-    { id: 6, nome: "Kit Dinossauro", descricao: "Caixa Milk personalizada. O kit contem 10 caixas Milk personalizadas.", preco: 55.00, imagem: "img/kit-dinossauro.jpeg" }
-  ],
-  brindes: [
-    { id: 7, nome: "Nutella Classica Dinossauro", descricao: "Nutella Classica personalizada. O kit contem 3 unidades.", preco: 90.00, imagem: "img/nutella-classica-dinossauro.jpeg" },
-    { id: 8, nome: "Tubolata Tampa Plastica", descricao: "Tubolata com tampa de plastico. O kit contem 10 tubolatas personalizadas.", preco: 60.00, imagem: "img/tubolata-tampa-plastica.jpeg" },
-    { id: 9, nome: "Saco Ziplock", descricao: "Saco Ziplock adesivado. Medida: 10x15 cm. O kit contem 10 unidades.", preco: 65.00, imagem: "img/saco-ziplock.jpeg" }
-  ],
-  centros: [
-    { id: 10, nome: "Centro de Mesa Personalizado", descricao: "Centro de mesa decorativo com o tema da sua festa.", preco: 45.00, imagem: "img/produto-exemplo.png" }
-  ]
+const firebaseConfig = {
+  apiKey: "AIzaSyDneS7ceP6ezPiZIec7NKSUFGMBHBctGj8",
+  authDomain: "dominique-personalizados.firebaseapp.com",
+  projectId: "dominique-personalizados",
+  storageBucket: "dominique-personalizados.firebasestorage.app",
+  messagingSenderId: "265740517102",
+  appId: "1:265740517102:web:c8058de40877e94aeffdff"
 };
+
+const app  = initializeApp(firebaseConfig);
+const db   = getFirestore(app);
+const auth = getAuth(app);
 
 const NOMES_CATEGORIAS = {
   topos:    "Topos de Bolo",
@@ -33,214 +23,247 @@ const NOMES_CATEGORIAS = {
   centros:  "Centros de Mesa"
 };
 
-const EMOJIS_CATEGORIAS = {
-  topos:    "🎉",
-  tematica: "🎈",
-  afetiva:  "💖",
-  brindes:  "🎀",
-  centros:  "🌸"
+const EMOJIS = {
+  topos:"🎉", tematica:"🎈", afetiva:"💖", brindes:"🎀", centros:"🌸"
 };
 
 let categoriaAtiva     = "todas";
 let produtoParaRemover = null;
 let modoEdicao         = null;
+let produtosCache      = {};
 
-document.addEventListener("DOMContentLoaded", () => {
-  if (!localStorage.getItem("produtos_admin")) {
-    localStorage.setItem("produtos_admin", JSON.stringify(PRODUTOS_PADRAO));
-  }
-  document.getElementById("senha-input").addEventListener("keydown", function(e) {
-    if (e.key === "Enter") fazerLogin();
-  });
-});
-
-function fazerLogin() {
-  var input = document.getElementById("senha-input").value;
-  var erro  = document.getElementById("login-erro");
-  if (input === SENHA_ADMIN) {
-    sessionStorage.setItem("admin_logado", "true");
+// ─── AUTH ─────────────────────────────────────────────────────────────────
+onAuthStateChanged(auth, (user) => {
+  if (user) {
     document.getElementById("login-screen").style.display = "none";
     document.getElementById("painel").style.display = "flex";
     iniciarPainel();
   } else {
-    erro.textContent = "Senha incorreta. Tente novamente.";
-    document.getElementById("senha-input").value = "";
-    document.getElementById("senha-input").focus();
-    setTimeout(function() { erro.textContent = ""; }, 3000);
-  }
-}
-
-function fazerLogout() {
-  sessionStorage.removeItem("admin_logado");
-  document.getElementById("painel").style.display = "none";
-  document.getElementById("login-screen").style.display = "flex";
-  document.getElementById("senha-input").value = "";
-}
-
-document.getElementById("toggle-senha").addEventListener("click", function() {
-  var input = document.getElementById("senha-input");
-  var icon  = document.querySelector("#toggle-senha i");
-  if (input.type === "password") {
-    input.type = "text";
-    icon.className = "fa fa-eye-slash";
-  } else {
-    input.type = "password";
-    icon.className = "fa fa-eye";
+    document.getElementById("painel").style.display = "none";
+    document.getElementById("login-screen").style.display = "flex";
   }
 });
 
-function iniciarPainel() {
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("senha-input").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") fazerLogin();
+  });
+  document.getElementById("email-input").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") document.getElementById("senha-input").focus();
+  });
+});
+
+async function fazerLogin() {
+  const email = document.getElementById("email-input").value.trim();
+  const senha = document.getElementById("senha-input").value;
+  const erro  = document.getElementById("login-erro");
+  const btn   = document.getElementById("btn-login");
+
+  if (!email || !senha) { erro.textContent = "Preencha o e-mail e a senha."; return; }
+
+  btn.textContent = "Entrando...";
+  btn.disabled = true;
+
+  try {
+    await signInWithEmailAndPassword(auth, email, senha);
+  } catch (e) {
+    erro.textContent = "E-mail ou senha incorretos.";
+    btn.textContent = "Entrar";
+    btn.disabled = false;
+    setTimeout(() => { erro.textContent = ""; }, 3000);
+  }
+}
+
+async function fazerLogout() {
+  await signOut(auth);
+}
+
+document.getElementById("toggle-senha").addEventListener("click", () => {
+  const input = document.getElementById("senha-input");
+  const icon  = document.querySelector("#toggle-senha i");
+  if (input.type === "password") { input.type = "text"; icon.className = "fa fa-eye-slash"; }
+  else { input.type = "password"; icon.className = "fa fa-eye"; }
+});
+
+// ─── PAINEL ───────────────────────────────────────────────────────────────
+async function iniciarPainel() {
   construirTabs();
+  await carregarProdutos();
   renderProdutos();
   atualizarStats();
 }
 
 function mostrarAba(aba) {
-  document.querySelectorAll(".aba").forEach(function(el) { el.style.display = "none"; });
+  document.querySelectorAll(".aba").forEach((el) => { el.style.display = "none"; });
   document.getElementById("aba-" + aba).style.display = "block";
-  document.querySelectorAll(".nav-btn").forEach(function(btn) { btn.classList.remove("active"); });
+  document.querySelectorAll(".nav-btn").forEach((btn) => btn.classList.remove("active"));
   event.currentTarget.classList.add("active");
   if (aba === "visitas")  atualizarStats();
   if (aba === "catalogo") renderProdutos();
 }
 
-function construirTabs() {
-  var container = document.getElementById("categoria-tabs");
-  container.innerHTML = "";
+// ─── FIRESTORE ────────────────────────────────────────────────────────────
+async function carregarProdutos() {
+  produtosCache = {};
+  Object.keys(NOMES_CATEGORIAS).forEach(cat => { produtosCache[cat] = []; });
+  try {
+    const snap = await getDocs(collection(db, "produtos"));
+    snap.forEach(docSnap => {
+      const p = docSnap.data();
+      if (produtosCache[p.categoria] !== undefined) {
+        produtosCache[p.categoria].push({ ...p, firestoreId: docSnap.id });
+      }
+    });
+  } catch (e) {
+    mostrarToastAdmin("Erro ao carregar produtos.", true);
+  }
+}
 
-  var todas = document.createElement("button");
+// ─── TABS ─────────────────────────────────────────────────────────────────
+function construirTabs() {
+  const container = document.getElementById("categoria-tabs");
+  container.innerHTML = "";
+  const todas = document.createElement("button");
   todas.className = "cat-tab active";
   todas.textContent = "Todas";
-  todas.onclick = function() { filtrarCategoria("todas", todas); };
+  todas.onclick = () => filtrarCategoria("todas", todas);
   container.appendChild(todas);
-
-  Object.keys(NOMES_CATEGORIAS).forEach(function(key) {
-    var btn = document.createElement("button");
+  Object.keys(NOMES_CATEGORIAS).forEach(key => {
+    const btn = document.createElement("button");
     btn.className = "cat-tab";
-    btn.textContent = EMOJIS_CATEGORIAS[key] + " " + NOMES_CATEGORIAS[key];
-    btn.onclick = function() { filtrarCategoria(key, btn); };
+    btn.textContent = EMOJIS[key] + " " + NOMES_CATEGORIAS[key];
+    btn.onclick = () => filtrarCategoria(key, btn);
     container.appendChild(btn);
   });
 }
 
 function filtrarCategoria(cat, btn) {
   categoriaAtiva = cat;
-  document.querySelectorAll(".cat-tab").forEach(function(b) { b.classList.remove("active"); });
+  document.querySelectorAll(".cat-tab").forEach(b => b.classList.remove("active"));
   btn.classList.add("active");
   renderProdutos();
 }
 
-function getProdutos() {
-  return JSON.parse(localStorage.getItem("produtos_admin")) || PRODUTOS_PADRAO;
-}
-
+// ─── RENDER ───────────────────────────────────────────────────────────────
 function renderProdutos() {
-  var grid     = document.getElementById("produtos-admin-grid");
-  var produtos = getProdutos();
+  const grid = document.getElementById("produtos-admin-grid");
   grid.innerHTML = "";
-  var total    = 0;
-  var encontrou = false;
+  let total = 0;
+  let encontrou = false;
+  const cats = categoriaAtiva === "todas" ? Object.keys(NOMES_CATEGORIAS) : [categoriaAtiva];
 
-  var categorias = categoriaAtiva === "todas" ? Object.keys(NOMES_CATEGORIAS) : [categoriaAtiva];
-
-  categorias.forEach(function(cat) {
-    var itens = produtos[cat] || [];
-    total += itens.length;
-    itens.forEach(function(produto) {
+  cats.forEach(cat => {
+    (produtosCache[cat] || []).forEach(produto => {
       encontrou = true;
-      var card = document.createElement("div");
+      total++;
+      const card = document.createElement("div");
       card.className = "produto-admin-card";
       card.innerHTML =
         '<img src="' + produto.imagem + '" alt="' + produto.nome + '" onerror="this.src=\'https://placehold.co/280x160/fce4ec/D96C8A?text=Sem+imagem\'">' +
         '<div class="produto-admin-info">' +
           '<h4>' + produto.nome + '</h4>' +
-          '<div class="preco-admin">R$ ' + produto.preco.toFixed(2) + '</div>' +
+          '<div class="preco-admin">R$ ' + Number(produto.preco).toFixed(2) + '</div>' +
           '<p class="desc-admin">' + produto.descricao + '</p>' +
-          '<span class="cat-label">' + EMOJIS_CATEGORIAS[cat] + ' ' + NOMES_CATEGORIAS[cat] + '</span>' +
+          '<span class="cat-label">' + EMOJIS[cat] + ' ' + NOMES_CATEGORIAS[cat] + '</span>' +
         '</div>' +
         '<div class="produto-admin-actions">' +
-          '<button class="btn-editar" onclick="editarProduto(\'' + cat + '\', \'' + produto.id + '\')">Editar</button>' +
-          '<button class="btn-remover" onclick="pedirRemocao(\'' + cat + '\', \'' + produto.id + '\', \'' + produto.nome.replace(/'/g, "\\'") + '\')">Remover</button>' +
+          '<button class="btn-editar" onclick="editarProduto(\'' + produto.firestoreId + '\')">Editar</button>' +
+          '<button class="btn-remover" onclick="pedirRemocao(\'' + produto.firestoreId + '\', \'' + produto.nome.replace(/'/g, "\\'") + '\')">Remover</button>' +
         '</div>';
       grid.appendChild(card);
     });
   });
 
   if (!encontrou) {
-    grid.innerHTML = '<div class="vazio-msg">Nenhum produto nesta categoria ainda.<br>Va em <strong>Adicionar Produto</strong> para comecar!</div>';
+    grid.innerHTML = '<div class="vazio-msg">Nenhum produto ainda.<br>Va em <strong>Adicionar Produto</strong> para comecar!</div>';
   }
-
   document.getElementById("total-produtos-badge").textContent = total + " produto" + (total !== 1 ? "s" : "");
 }
 
-function salvarProduto() {
-  var categoria = document.getElementById("form-categoria").value;
-  var nome      = document.getElementById("form-nome").value.trim();
-  var descricao = document.getElementById("form-descricao").value.trim();
-  var preco     = parseFloat(document.getElementById("form-preco").value);
-  var msgEl     = document.getElementById("form-msg");
+// ─── TIPO DE IMAGEM ───────────────────────────────────────────────────────
+function alternarTipoImagem(tipo) {
+  document.getElementById("input-arquivo").style.display = tipo === "arquivo" ? "block" : "none";
+  document.getElementById("input-url").style.display     = tipo === "url"     ? "block" : "none";
+  document.getElementById("preview-imagem").style.display = "none";
+}
 
-  var tipoChecked = document.querySelector('input[name="tipo-imagem"]:checked');
-  var tipoImagem  = tipoChecked ? tipoChecked.value : "arquivo";
-  var imagem = tipoImagem === "arquivo"
+function previewImagem() {
+  const tipoChecked = document.querySelector('input[name="tipo-imagem"]:checked');
+  const tipo = tipoChecked ? tipoChecked.value : "arquivo";
+  const src  = tipo === "arquivo"
+    ? document.getElementById("form-imagem-arquivo").value.trim()
+    : document.getElementById("form-imagem-url").value.trim();
+  if (!src) { mostrarToastAdmin("Informe o caminho ou URL da imagem.", true); return; }
+  const preview = document.getElementById("preview-imagem");
+  const img     = document.getElementById("preview-img");
+  img.src = src;
+  preview.style.display = "block";
+  img.onerror = () => { preview.style.display = "none"; mostrarToastAdmin("Imagem não encontrada.", true); };
+}
+
+// ─── SALVAR ───────────────────────────────────────────────────────────────
+async function salvarProduto() {
+  const categoria = document.getElementById("form-categoria").value;
+  const nome      = document.getElementById("form-nome").value.trim();
+  const descricao = document.getElementById("form-descricao").value.trim();
+  const preco     = parseFloat(document.getElementById("form-preco").value);
+  const msgEl     = document.getElementById("form-msg");
+
+  const tipoChecked = document.querySelector('input[name="tipo-imagem"]:checked');
+  const tipo = tipoChecked ? tipoChecked.value : "arquivo";
+  const imagem = tipo === "arquivo"
     ? document.getElementById("form-imagem-arquivo").value.trim()
     : document.getElementById("form-imagem-url").value.trim();
 
   if (!nome || !descricao || isNaN(preco) || preco <= 0 || !imagem) {
-    msgEl.textContent = "Preencha todos os campos obrigatorios.";
+    msgEl.textContent = "Preencha todos os campos obrigatórios.";
     msgEl.className = "form-msg erro";
-    setTimeout(function() { msgEl.textContent = ""; }, 3000);
+    setTimeout(() => { msgEl.textContent = ""; }, 3000);
     return;
   }
 
-  var produtos = getProdutos();
+  const btnSalvar = document.querySelector(".btn-salvar");
+  btnSalvar.textContent = "Salvando...";
+  btnSalvar.disabled = true;
 
-  if (modoEdicao) {
-    var oldCat = modoEdicao.categoria;
-    var idx = (produtos[oldCat] || []).findIndex(function(p) { return String(p.id) === String(modoEdicao.id); });
-    if (idx !== -1) {
-      var produtoAtualizado = Object.assign({}, produtos[oldCat][idx], { nome: nome, descricao: descricao, preco: preco, imagem: imagem });
-      if (oldCat !== categoria) {
-        produtos[oldCat].splice(idx, 1);
-        if (!produtos[categoria]) produtos[categoria] = [];
-        produtos[categoria].push(produtoAtualizado);
-      } else {
-        produtos[oldCat][idx] = produtoAtualizado;
-      }
-    }
+  try {
+    const firestoreId = modoEdicao ? modoEdicao : Date.now().toString();
+    await setDoc(doc(db, "produtos", firestoreId), { nome, descricao, preco, imagem, categoria });
+    msgEl.textContent = modoEdicao ? "Produto atualizado!" : "Produto adicionado!";
+    msgEl.className = "form-msg sucesso";
+    setTimeout(() => { msgEl.textContent = ""; }, 3000);
     modoEdicao = null;
-    msgEl.textContent = "Produto atualizado com sucesso!";
-  } else {
-    var todosIds = Object.values(produtos).flat().map(function(p) { return Number(p.id); });
-    var novoId   = todosIds.length > 0 ? Math.max.apply(null, todosIds) + 1 : 1;
-    if (!produtos[categoria]) produtos[categoria] = [];
-    produtos[categoria].push({ id: novoId, nome: nome, descricao: descricao, preco: preco, imagem: imagem });
-    msgEl.textContent = "Produto adicionado com sucesso!";
+    limparFormulario();
+    await carregarProdutos();
+    renderProdutos();
+    mostrarToastAdmin("Produto salvo com sucesso! ✅");
+  } catch (e) {
+    msgEl.textContent = "Erro ao salvar. Tente novamente.";
+    msgEl.className = "form-msg erro";
+    mostrarToastAdmin("Erro ao salvar produto.", true);
   }
 
-  localStorage.setItem("produtos_admin", JSON.stringify(produtos));
-  msgEl.className = "form-msg sucesso";
-  setTimeout(function() { msgEl.textContent = ""; }, 4000);
-  limparFormulario();
-  mostrarToastAdmin("Produto salvo!");
+  btnSalvar.innerHTML = '<i class="fa fa-check"></i> Salvar Produto';
+  btnSalvar.disabled = false;
 }
 
-function editarProduto(categoria, id) {
-  var produtos = getProdutos();
-  var produto  = (produtos[categoria] || []).find(function(p) { return String(p.id) === String(id); });
+// ─── EDITAR ───────────────────────────────────────────────────────────────
+function editarProduto(firestoreId) {
+  let produto = null;
+  Object.values(produtosCache).flat().forEach(p => { if (p.firestoreId === firestoreId) produto = p; });
   if (!produto) return;
 
-  document.querySelectorAll(".aba").forEach(function(el) { el.style.display = "none"; });
+  document.querySelectorAll(".aba").forEach(el => { el.style.display = "none"; });
   document.getElementById("aba-adicionar").style.display = "block";
-  document.querySelectorAll(".nav-btn").forEach(function(btn) { btn.classList.remove("active"); });
+  document.querySelectorAll(".nav-btn").forEach(btn => btn.classList.remove("active"));
   document.querySelectorAll(".nav-btn")[1].classList.add("active");
 
-  document.getElementById("form-categoria").value   = categoria;
+  document.getElementById("form-categoria").value  = produto.categoria;
   document.getElementById("form-nome").value        = produto.nome;
   document.getElementById("form-descricao").value   = produto.descricao;
-  document.getElementById("form-preco").value       = produto.preco;
+  document.getElementById("form-preco").value        = produto.preco;
 
-  var isUrl = produto.imagem.startsWith("http");
+  const isUrl = produto.imagem.startsWith("http");
   if (isUrl) {
     document.querySelector('input[name="tipo-imagem"][value="url"]').checked = true;
     alternarTipoImagem("url");
@@ -251,10 +274,15 @@ function editarProduto(categoria, id) {
     document.getElementById("form-imagem-arquivo").value = produto.imagem;
   }
 
-  previewImagem();
-  modoEdicao = { categoria: categoria, id: id };
+  const preview = document.getElementById("preview-imagem");
+  const imgEl   = document.getElementById("preview-img");
+  imgEl.src = produto.imagem;
+  preview.style.display = "block";
+
+  modoEdicao = firestoreId;
   document.querySelector(".btn-salvar").innerHTML = '<i class="fa fa-check"></i> Atualizar Produto';
-  document.querySelector("#aba-adicionar .page-header h2").textContent = "Editar Produto";
+  const h2 = document.querySelector("#aba-adicionar .page-header h2");
+  if (h2) h2.textContent = "✏️ Editar Produto";
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
@@ -267,37 +295,16 @@ function limparFormulario() {
   document.getElementById("preview-imagem").style.display = "none";
   document.getElementById("form-msg").textContent = "";
   modoEdicao = null;
+  document.querySelector('input[name="tipo-imagem"][value="arquivo"]').checked = true;
+  alternarTipoImagem("arquivo");
   document.querySelector(".btn-salvar").innerHTML = '<i class="fa fa-check"></i> Salvar Produto';
-  var h2 = document.querySelector("#aba-adicionar .page-header h2");
-  if (h2) h2.textContent = "Adicionar Produto";
+  const h2 = document.querySelector("#aba-adicionar .page-header h2");
+  if (h2) h2.textContent = "➕ Adicionar Produto";
 }
 
-function alternarTipoImagem(tipo) {
-  document.getElementById("input-arquivo").style.display = tipo === "arquivo" ? "block" : "none";
-  document.getElementById("input-url").style.display     = tipo === "url"     ? "block" : "none";
-  document.getElementById("preview-imagem").style.display = "none";
-}
-
-function previewImagem() {
-  var tipoChecked = document.querySelector('input[name="tipo-imagem"]:checked');
-  var tipo = tipoChecked ? tipoChecked.value : "arquivo";
-  var src  = tipo === "arquivo"
-    ? document.getElementById("form-imagem-arquivo").value.trim()
-    : document.getElementById("form-imagem-url").value.trim();
-
-  if (!src) { mostrarToastAdmin("Informe o caminho ou URL da imagem.", true); return; }
-  var preview = document.getElementById("preview-imagem");
-  var img     = document.getElementById("preview-img");
-  img.src = src;
-  preview.style.display = "block";
-  img.onerror = function() {
-    preview.style.display = "none";
-    mostrarToastAdmin("Imagem nao encontrada.", true);
-  };
-}
-
-function pedirRemocao(categoria, id, nome) {
-  produtoParaRemover = { categoria: categoria, id: id };
+// ─── REMOVER ──────────────────────────────────────────────────────────────
+function pedirRemocao(firestoreId, nome) {
+  produtoParaRemover = firestoreId;
   document.getElementById("modal-nome-produto").textContent = nome;
   document.getElementById("modal-confirmar").style.display = "flex";
 }
@@ -307,22 +314,24 @@ function cancelarRemocao() {
   document.getElementById("modal-confirmar").style.display = "none";
 }
 
-function confirmarRemocao() {
+async function confirmarRemocao() {
   if (!produtoParaRemover) return;
-  var produtos  = getProdutos();
-  var cat = produtoParaRemover.categoria;
-  var id  = produtoParaRemover.id;
-  produtos[cat] = (produtos[cat] || []).filter(function(p) { return String(p.id) !== String(id); });
-  localStorage.setItem("produtos_admin", JSON.stringify(produtos));
-  cancelarRemocao();
-  renderProdutos();
-  mostrarToastAdmin("Produto removido!");
+  try {
+    await deleteDoc(doc(db, "produtos", produtoParaRemover));
+    cancelarRemocao();
+    await carregarProdutos();
+    renderProdutos();
+    mostrarToastAdmin("Produto removido!");
+  } catch (e) {
+    mostrarToastAdmin("Erro ao remover.", true);
+    cancelarRemocao();
+  }
 }
 
+// ─── STATS ────────────────────────────────────────────────────────────────
 function atualizarStats() {
-  var visitas  = parseInt(localStorage.getItem("contadorVisitas") || "0");
-  var produtos = getProdutos();
-  var total    = Object.values(produtos).flat().length;
+  const visitas = parseInt(localStorage.getItem("contadorVisitas") || "0");
+  const total   = Object.values(produtosCache).flat().length;
   document.getElementById("stat-visitas-total").textContent  = visitas.toLocaleString("pt-BR");
   document.getElementById("stat-produtos-total").textContent = total;
 }
@@ -336,9 +345,24 @@ function resetarVisitas() {
   }
 }
 
+// ─── TOAST ────────────────────────────────────────────────────────────────
 function mostrarToastAdmin(msg, isErro) {
-  var toast = document.getElementById("toast-admin");
+  const toast = document.getElementById("toast-admin");
   toast.textContent = msg;
   toast.className = isErro ? "erro show" : "show";
-  setTimeout(function() { toast.className = ""; }, 2500);
+  setTimeout(() => { toast.className = ""; }, 2500);
 }
+
+window.fazerLogin         = fazerLogin;
+window.fazerLogout        = fazerLogout;
+window.mostrarAba         = mostrarAba;
+window.filtrarCategoria   = filtrarCategoria;
+window.salvarProduto      = salvarProduto;
+window.editarProduto      = editarProduto;
+window.limparFormulario   = limparFormulario;
+window.alternarTipoImagem = alternarTipoImagem;
+window.previewImagem      = previewImagem;
+window.pedirRemocao       = pedirRemocao;
+window.cancelarRemocao    = cancelarRemocao;
+window.confirmarRemocao   = confirmarRemocao;
+window.resetarVisitas     = resetarVisitas;

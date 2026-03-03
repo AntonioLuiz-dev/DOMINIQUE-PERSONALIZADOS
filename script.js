@@ -19,28 +19,21 @@ menuToggle.addEventListener("click", () => {
   navMenu.classList.toggle("active");
 });
 
-// ===== SCROLL SUAVE — implementação própria com easing, ignora qualquer CSS =====
+// ===== SCROLL SUAVE =====
 function scrollSuave(destino, duracao) {
   const inicio    = window.pageYOffset;
   const distancia = destino - inicio;
   let startTime   = null;
 
-  // Função de easing (ease-in-out cúbico)
   function easing(t) {
-    return t < 0.5
-      ? 4 * t * t * t
-      : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
   }
 
   function passo(timestamp) {
     if (!startTime) startTime = timestamp;
-    const progresso  = Math.min((timestamp - startTime) / duracao, 1);
-    const easedPos   = easing(progresso);
-    window.scrollTo(0, inicio + distancia * easedPos);
-
-    if (progresso < 1) {
-      requestAnimationFrame(passo);
-    }
+    const progresso = Math.min((timestamp - startTime) / duracao, 1);
+    window.scrollTo(0, inicio + distancia * easing(progresso));
+    if (progresso < 1) requestAnimationFrame(passo);
   }
 
   requestAnimationFrame(passo);
@@ -50,17 +43,13 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
   anchor.addEventListener("click", function (e) {
     const href   = this.getAttribute("href");
     if (!href || href === "#") return;
-
     const target = document.querySelector(href);
     if (!target) return;
-
     e.preventDefault();
     navMenu.classList.remove("active");
-
     const headerHeight = document.querySelector("header")?.offsetHeight || 80;
     const destino      = target.getBoundingClientRect().top + window.pageYOffset - headerHeight - 10;
-
-    scrollSuave(destino, 800); // 800ms de duração
+    scrollSuave(destino, 800);
   });
 });
 
@@ -119,29 +108,8 @@ function iniciarAnimacaoSobre() {
   if (secaoSobre) observer.observe(secaoSobre);
 }
 
-// ===== CONTADOR DE VISITAS (discreto no footer) =====
-function iniciarContadorVisitas() {
-  let visitas = parseInt(localStorage.getItem("contadorVisitas") || "0");
-
-  if (!sessionStorage.getItem("visitaContada")) {
-    visitas++;
-    localStorage.setItem("contadorVisitas", visitas);
-    sessionStorage.setItem("visitaContada", "true");
-  }
-
-  const footer = document.querySelector("footer");
-  if (!footer) return;
-
-  const contador     = document.createElement("p");
-  contador.id        = "visit-counter";
-  contador.innerHTML = `👁️ ${visitas.toLocaleString("pt-BR")} visita${visitas !== 1 ? "s" : ""}`;
-  contador.title     = "Contador de visitas";
-  footer.appendChild(contador);
-}
-
 // ===== INIT =====
 document.addEventListener("DOMContentLoaded", () => {
   atualizarBadgeCarrinho();
   iniciarAnimacaoSobre();
-  iniciarContadorVisitas();
 });

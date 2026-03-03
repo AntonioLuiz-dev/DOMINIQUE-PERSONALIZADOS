@@ -122,6 +122,24 @@ service cloud.firestore {
 
 ---
 
+## Formulário de Contato — EmailJS
+
+O formulário "Fale Conosco" envia a mensagem diretamente para o Gmail e abre o WhatsApp simultaneamente, sem redirecionar o cliente para outra página.
+
+Credenciais já configuradas em `script.js`:
+
+| Variável | Valor |
+|---|---|
+| EMAILJS_SERVICE_ID | service_xryre6z |
+| EMAILJS_TEMPLATE_ID | template_08e99qk |
+| EMAILJS_PUBLIC_KEY | CkejzIdfj3Y78LCnH |
+| Gmail conectado | dominiquepersonalizados@gmail.com |
+
+Se precisar reconfigurar, acesse emailjs.com > Email Services.
+Limite do plano gratuito: **200 emails/mês**.
+
+---
+
 ## Configuração do Pagamento
 
 No arquivo carrinho.js, no topo:
@@ -168,6 +186,7 @@ O painel exibe a imagem ./img/mascote.png na tela de login e na sidebar. Para us
 
 - HTML5, CSS3, JavaScript (ES Modules)
 - Firebase v12 — Firestore + Authentication
+- EmailJS v4 — Envio de email pelo formulário de contato
 - Mercado Pago — Link de pagamento por cartão
 - ViaCEP — Consulta de CEP para frete
 - QRCode.js — Geração de QR Code do PIX

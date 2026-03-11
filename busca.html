@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Busca | Dominique Personalizados</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="./img/favicon.ico">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header>
+    <div class="logo">
+      <img src="./img/mascote.png" alt="Mascote Dominique" class="mascote">
+      <h1 class="logo-text">
+        <span class="logo-dominique">Dominique</span>
+        <span class="logo-personalizados">Personalizados</span>
+      </h1>
+    </div>
+
+    <div class="header-search">
+      <input type="text" id="busca-input-header" placeholder="Buscar produtos...">
+      <button id="busca-btn-header">🔍</button>
+    </div>
+
+    <nav id="nav-menu">
+      <a href="index.html#home">Home</a>
+      <a href="index.html#produtos">Produtos</a>
+      <a href="carrinho.html" class="carrinho-header">
+        🛒 Carrinho
+        <span id="cart-count" class="cart-badge">0</span>
+      </a>
+    </nav>
+
+    <div class="menu-toggle" id="menu-toggle">
+      <span></span><span></span><span></span>
+    </div>
+  </header>
+
+  <section class="busca-section">
+    <div class="busca-header">
+      <h2>🔍 Busca</h2>
+      <div class="busca-input-group">
+        <input type="text" id="busca-input" placeholder="Ex: topo unicórnio, kit festa...">
+        <button id="busca-btn">Buscar</button>
+      </div>
+    </div>
+    <p id="busca-titulo"></p>
+    <div class="catalogo-grid" id="busca-grid"></div>
+  </section>
+
+  <div id="toast"></div>
+  <script type="module" src="busca.js"></script>
+</body>
+</html>

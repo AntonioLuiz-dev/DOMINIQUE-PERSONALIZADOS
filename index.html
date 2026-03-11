@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
   <meta charset="UTF-8">
   <title>Dominique Personalizados</title>
@@ -11,41 +10,9 @@
   <link href="https://fonts.cdnfonts.com/css/a-little-sunshine" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="style.css">
-  <style>
-    .produtos-container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 30px;
-      margin-top: 30px;
-    }
-
-    .produtos-container .produto-card {
-      flex: 0 1 220px;
-    }
-
-    .admin-link {
-      display: inline-block;
-      margin-top: 12px;
-      font-size: 13px;
-      font-weight: 500;
-      color: #1a3a5c;
-      text-decoration: none;
-      letter-spacing: 0.4px;
-      padding: 5px 14px;
-      border-radius: 20px;
-      background: rgba(255, 255, 255, 0.25);
-      transition: background 0.2s, color 0.2s;
-    }
-
-    .admin-link:hover {
-      background: rgba(255, 255, 255, 0.45);
-      color: #0d2238;
-    }
-  </style>
 </head>
-
 <body>
+
   <header>
     <div class="logo">
       <img src="./img/mascote.png" alt="Mascote Dominique" class="mascote">
@@ -54,64 +21,95 @@
         <span class="logo-personalizados">Personalizados</span>
       </h1>
     </div>
+
+    <!-- BUSCA -->
+    <div class="header-search" id="header-search-desktop">
+      <input type="text" id="busca-header" placeholder="Buscar produtos...">
+      <button id="busca-header-btn">🔍 Buscar</button>
+    </div>
+
     <nav id="nav-menu">
       <a href="#home">Home</a>
       <a href="#sobre">Quem Somos</a>
-      <a href="#instrucoes">Instrucoes</a>
+      <a href="#instrucoes">Instruções</a>
       <a href="#produtos">Produtos</a>
-      <a href="carrinho.html" class="carrinho-header">Carrinho <span id="cart-count" class="cart-badge">0</span></a>
+      <a href="carrinho.html" class="carrinho-header">
+        Carrinho <span id="cart-count" class="cart-badge">0</span>
+      </a>
       <a href="#contato">Contato</a>
     </nav>
-    <div class="menu-toggle" id="menu-toggle"><span></span><span></span><span></span></div>
+
+    <div class="menu-toggle" id="menu-toggle">
+      <span></span><span></span><span></span>
+    </div>
   </header>
+
   <section id="home">
-    <h2>Personalizados feitos com carinho para momentos inesqueciveis</h2>
-    <p>Criamos papelaria personalizada e afetiva para transformar sua festa em uma lembranca cheia de amor.</p>
+    <h2>Personalizados feitos com carinho para momentos inesquecíveis</h2>
+    <p>Criamos papelaria personalizada e afetiva para transformar sua festa em uma lembrança cheia de amor.</p>
   </section>
+
   <section id="sobre">
     <h2>Quem Somos</h2>
     <div class="sobre-container">
       <div class="sobre-texto">
-        <p>A Dominique Personalizados nasceu do amor pelos detalhes e pela alegria das comemoracoes. Criamos papelaria
-          personalizada ha mais de 7 anos com muito carinho.</p>
+        <p>A Dominique Personalizados nasceu do amor pelos detalhes e pela alegria das comemorações. Criamos papelaria
+          personalizada há mais de 7 anos com muito carinho.</p>
       </div>
-      <div class="sobre-imagem"><img src="./img/DOMINIQUE.png" alt="Dominique Personalizados"></div>
+      <div class="sobre-imagem">
+        <img src="./img/DOMINIQUE.png" alt="Dominique Personalizados">
+      </div>
     </div>
   </section>
+
   <section id="instrucoes">
-    <h2>Instrucoes para sua Compra</h2>
+    <h2>Instruções para sua Compra</h2>
     <div class="instrucoes-box">
       <p>Seja muito bem-vindo(a) a Dominique Personalizados</p>
       <p>Para agilizar seu atendimento, informe:</p>
       <p>Data da festa, Tema escolhido, Itens desejados</p>
-      <p>Assim preparo um orcamento especial com todo carinho.</p>
-      <p class="pagamento">Pagamento via <strong>Pix</strong> ou <strong>Cartao de Credito</strong>.<br>
-        Apos a confirmacao do pagamento, sua encomenda e registrada com carinho e sua data fica reservada com
-        exclusividade para voce.
+      <p>Assim preparo um orçamento especial com todo carinho.</p>
+      <p class="pagamento">Pagamento via <strong>Pix</strong> ou <strong>Cartão de Crédito</strong>.<br>
+        Após a confirmação do pagamento, sua encomenda é registrada com carinho e sua data fica reservada com
+        exclusividade para você.
         Caso opte pela <strong>entrega</strong>, informe seu CEP ao finalizar o pedido.
         Se preferir a <strong>retirada presencial</strong>, deixe o campo em branco.</p>
     </div>
   </section>
+
   <section id="produtos">
     <h2>Nossos Produtos</h2>
     <div class="produtos-container">
-      <a href="catalogo.html?categoria=topos" class="produto-card"><span>🎉</span>
-        <h3>Topos de Bolo</h3>
+      <a href="catalogo.html?categoria=topos" class="produto-card">
+        <span>🎉</span><h3>Topos de Bolo</h3>
       </a>
-      <a href="catalogo.html?categoria=tematica" class="produto-card"><span>🎈</span>
-        <h3>Kit Festa</h3>
+      <a href="catalogo.html?categoria=tematica" class="produto-card">
+        <span>🎈</span><h3>Kit Festa</h3>
       </a>
-      <a href="catalogo.html?categoria=afetiva" class="produto-card"><span>💖</span>
-        <h3>Papelaria Afetiva</h3>
+      <a href="catalogo.html?categoria=afetiva" class="produto-card">
+        <span>💖</span><h3>Papelaria Afetiva</h3>
       </a>
-      <a href="catalogo.html?categoria=brindes" class="produto-card"><span>🎀</span>
-        <h3>Brindes Personalizados</h3>
+      <a href="catalogo.html?categoria=brindes" class="produto-card">
+        <span>🎀</span><h3>Brindes Personalizados</h3>
       </a>
-      <a href="catalogo.html?categoria=centros" class="produto-card"><span>🌸</span>
-        <h3>Centros de Mesa</h3>
+      <a href="catalogo.html?categoria=centros" class="produto-card">
+        <span>🌸</span><h3>Centros de Mesa</h3>
+      </a>
+      <a href="catalogo.html?categoria=pegue_monte" class="produto-card">
+        <span>📦</span><h3>Pegue e Monte</h3>
+      </a>
+      <a href="catalogo.html?categoria=acetato" class="produto-card">
+        <span>🧊</span><h3>Caixas de Acetato</h3>
+      </a>
+      <a href="catalogo.html?categoria=convites" class="produto-card">
+        <span>✉️</span><h3>Convites</h3>
+      </a>
+      <a href="catalogo.html?categoria=pascoa" class="produto-card">
+        <span>🐣</span><h3>Páscoa</h3>
       </a>
     </div>
   </section>
+
   <section id="contato">
     <h2>Fale Conosco</h2>
     <form id="form-contato">
@@ -121,17 +119,29 @@
       <button type="submit">Enviar mensagem</button>
     </form>
   </section>
+
   <footer>
     <p>2026 Dominique Personalizados - Feito com carinho</p>
-    <p>Desenvolvido por antonioluiz.dev@outlook.com</p>
-    <a href="admin.html" class="admin-link">Area Admin</a>
+    <p>Desenvolvido por <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="badbd4ced5d4d3d5d6cfd3c094dedfccfad5cfced6d5d5d194d9d5d7">[email&#160;protected]</a></p>
+    <a href="admin.html" class="admin-link">⚙ Área Admin</a>
   </footer>
-  <a href="https://www.instagram.com/dominiquepersonalizados" class="instagram-float" target="_blank"><i
-      class="fab fa-instagram"></i></a>
-  <a href="https://wa.me/5521983394115" class="whatsapp-float" target="_blank"><i class="fab fa-whatsapp"></i></a>
-  <div id="toast"></div>
-  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-  <script src="script.js"></script>
-</body>
 
-</html>
+  <a href="https://www.instagram.com/dominiquepersonalizados" class="instagram-float" target="_blank">
+    <i class="fab fa-instagram"></i>
+  </a>
+  <a href="https://wa.me/5521983394115" class="whatsapp-float" target="_blank">
+    <i class="fab fa-whatsapp"></i>
+  </a>
+
+  <div id="toast"></div>
+
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script src="script.js"></script>
+  <script>
+    // Busca no header
+    function irParaBusca() {
+      const q = document.getElementById("busca-header").value.trim();
+      if (!q) return;
+      window.location.href = "busca.html?q=" + encodeURIComponent(q);
+    }
+    document.get

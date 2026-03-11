@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
   <meta charset="UTF-8">
   <title>Catálogo | Dominique Personalizados</title>
@@ -9,12 +8,18 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
   <header class="catalogo-header">
     <a href="index.html#produtos" class="voltar">← Voltar</a>
     <h2 id="titulo-catalogo">Catálogo</h2>
+
+    <!-- BUSCA -->
+    <div class="header-search">
+      <input type="text" id="busca-catalogo" placeholder="Buscar...">
+      <button id="busca-catalogo-btn">🔍</button>
+    </div>
+
     <a href="carrinho.html" class="carrinho-link">🛒</a>
   </header>
 
@@ -22,8 +27,20 @@
     <div class="catalogo-grid" id="catalogo-grid"></div>
   </section>
 
-  <!-- type="module" obrigatório para o Firebase funcionar -->
   <script type="module" src="catalogo.js"></script>
+  <script>
+    document.getElementById("busca-catalogo-btn").addEventListener("click", function() {
+      const q = document.getElementById("busca-catalogo").value.trim();
+      if (!q) return;
+      window.location.href = "busca.html?q=" + encodeURIComponent(q);
+    });
+    document.getElementById("busca-catalogo").addEventListener("keydown", function(e) {
+      if (e.key === "Enter") {
+        const q = this.value.trim();
+        if (!q) return;
+        window.location.href = "busca.html?q=" + encodeURIComponent(q);
+      }
+    });
+  </script>
 </body>
-
 </html>

@@ -11,7 +11,9 @@ dominique-personalizados/
 │
 ├── index.html            # Página principal
 ├── catalogo.html         # Página do catálogo por categoria
-├── catalogo.js           # Lógica do catálogo (lê do Firebase)
+├── catalogo.js           # Lógica do catálogo (lê do Firebase, carrossel)
+├── busca.html            # Página de resultados de busca
+├── busca.js              # Lógica da busca (pesquisa em todos os produtos)
 ├── carrinho.html         # Página do carrinho de compras
 ├── carrinho.css          # Estilos do carrinho
 ├── carrinho.js           # Lógica do carrinho (PIX, cartão, frete)
@@ -34,8 +36,11 @@ dominique-personalizados/
 
 ### Site principal
 - Página inicial com seções: Home, Quem Somos, Instruções, Produtos, Contato
-- Catálogo com 5 categorias de produtos
-- Lightbox para ampliar imagens dos produtos
+- **Barra de busca no header** — pesquisa por nome, descrição e categoria em todos os produtos
+- Vitrine com **8 categorias** de produtos
+- Catálogo por categoria com carrossel de imagens
+- **Carrossel infinito** nos cards de produto (múltiplas fotos, autoplay, setas, dots)
+- Lightbox para ampliar imagens (funciona tanto no carrossel quanto em imagem única)
 - Carrinho de compras com persistência em localStorage
 - Pagamento via PIX (10% de desconto automático) com QR Code gerado localmente
 - Pagamento via Cartão de Crédito (redireciona para Mercado Pago)
@@ -45,11 +50,19 @@ dominique-personalizados/
 - Animações de entrada na seção "Quem Somos"
 - Scroll suave customizado
 
+### Busca (/busca.html)
+- Acessível pela barra no header do index.html e do catalogo.html
+- Busca simultânea em nome, descrição e categoria de todos os produtos do Firestore
+- Exibe o número de resultados encontrados
+- Cards com carrossel, botões de carrinho e WhatsApp
+
 ### Painel Administrativo (/admin.html)
 - Login seguro com e-mail e senha via Firebase Authentication
 - Gerenciar Catálogo: visualizar, editar e remover produtos
-- Adicionar Produto: formulário completo com preview de imagem
-- Imagem por caminho local (img/) ou URL externa
+- Adicionar Produto: formulário completo com suporte a **múltiplas imagens**
+- Adicione até **10 imagens** por produto (pasta img/ ou URL externa)
+- Reordene as imagens com ↑↓ — a primeira é sempre a capa
+- Badge "📷 N fotos" nos cards do catálogo admin
 - Filtro por categoria no catálogo admin
 - Estatísticas: contador de visitas e total de produtos
 - Todas as alterações refletem instantaneamente no site para todos os visitantes
@@ -65,7 +78,7 @@ O projeto usa dois serviços do Firebase (plano gratuito Spark):
 | Firestore Database | Armazena os produtos do catálogo |
 | Authentication | Login do painel administrativo |
 
-### Credenciais (já configuradas em admin.js e catalogo.js)
+### Credenciais (já configuradas em admin.js, catalogo.js e busca.js)
 
 ```js
 const firebaseConfig = {
@@ -93,6 +106,21 @@ service cloud.firestore {
 }
 ```
 
+### Estrutura de um documento de produto no Firestore
+
+```js
+{
+  nome:      "Topo de Bolo Unicórnio",
+  descricao: "Topo em acrílico personalizado...",
+  preco:     35.90,
+  categoria: "topos",
+  imagens:   ["img/topo1.jpg", "img/topo2.jpg"],  // array (campo atual)
+  imagem:    "img/topo1.jpg"                        // campo legado (retrocompatível)
+}
+```
+
+> Produtos cadastrados antes da atualização (campo `imagem` único) continuam funcionando normalmente sem precisar ser reeditados.
+
 ---
 
 ## Categorias do Catálogo
@@ -104,6 +132,9 @@ service cloud.firestore {
 | afetiva | Papelaria Afetiva |
 | brindes | Brindes Personalizados |
 | centros | Centros de Mesa |
+| pegue_monte | Pegue e Monte |
+| acetato | Caixas de Acetato |
+| convites | Convites |
 
 ---
 
@@ -113,11 +144,12 @@ service cloud.firestore {
 1. Acesse seusite.com/admin.html
 2. Faça login com seu e-mail e senha
 3. Clique em "Adicionar Produto"
-4. Preencha os campos e salve
-5. O produto aparece no catálogo imediatamente para todos
+4. Preencha nome, descrição, preço e categoria
+5. Adicione as imagens uma a uma (até 10) e reordene com ↑↓ se quiser
+6. Clique em "Salvar Produto" — aparece no catálogo imediatamente para todos
 
-**Para a imagem, você tem duas opções:**
-- Pasta img/ — adicione o arquivo na pasta img/ do projeto, faça deploy e informe o nome (ex: img/produto.jpg)
+**Para as imagens, você tem duas opções:**
+- Pasta img/ — salve o arquivo na pasta `img/` do projeto, faça deploy e informe o nome (ex: `img/produto.jpg`)
 - URL externa — hospede a imagem gratuitamente no Imgur (imgur.com) ou Google Drive e cole o link direto
 
 ---
@@ -142,18 +174,19 @@ Limite do plano gratuito: **200 emails/mês**.
 
 ## Configuração do Pagamento
 
-No arquivo carrinho.js, no topo:
+No arquivo `carrinho.js`, no topo:
 
 ```js
-const CHAVE_PIX             = "000.000.000-00"; // Substitua pelo seu CPF
-const LINK_PAGAMENTO_CARTAO = "https://mpago.la/..."; // Link do Mercado Pago
+const CHAVE_PIX             = "145.602.617-84"; // Seu CPF (chave PIX)
+const CHAVE_PIX_EXIBIDA     = "145.602.617-84"; // Como exibir ao usuário
+const LINK_PAGAMENTO_CARTAO = "link.mercadopago.com.br/..."; // Link do Mercado Pago
 const DESCONTO_PIX          = 0.10; // 10% de desconto no PIX
 ```
 
 **Como criar o link do Mercado Pago:**
 1. Acesse mercadopago.com.br
-2. Va em Cobrar > Link de pagamento
-3. Crie o link e cole em LINK_PAGAMENTO_CARTAO
+2. Vá em Cobrar > Link de pagamento
+3. Crie o link e cole em `LINK_PAGAMENTO_CARTAO`
 
 ---
 
@@ -162,15 +195,15 @@ const DESCONTO_PIX          = 0.10; // 10% de desconto no PIX
 1. Suba o projeto para um repositório no GitHub
 2. Acesse vercel.com e conecte o repositório
 3. Clique em Deploy — o Vercel detecta automaticamente que é um site estático
-4. A cada git push o site é atualizado automaticamente
+4. A cada `git push` o site é atualizado automaticamente
 
-O Firebase é independente da hospedagem. Voce pode trocar de provedor a qualquer momento sem perder os produtos cadastrados.
+O Firebase é independente da hospedagem. Você pode trocar de provedor a qualquer momento sem perder os produtos cadastrados.
 
 ---
 
 ## Logotipo no Painel Admin
 
-O painel exibe a imagem ./img/mascote.png na tela de login e na sidebar. Para usar uma foto ou logo diferente, troque o atributo src nas tags dentro de admin.html:
+O painel exibe a imagem `./img/mascote.png` na tela de login e na sidebar. Para usar uma foto ou logo diferente, troque o atributo `src` nas tags dentro de `admin.html`:
 
 ```html
 <!-- tela de login -->

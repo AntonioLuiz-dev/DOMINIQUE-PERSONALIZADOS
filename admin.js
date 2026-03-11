@@ -16,15 +16,20 @@ const db   = getFirestore(app);
 const auth = getAuth(app);
 
 const NOMES_CATEGORIAS = {
-  topos:    "Topos de Bolo",
-  tematica: "Kit Festa",
-  afetiva:  "Papelaria Afetiva",
-  brindes:  "Brindes Personalizados",
-  centros:  "Centros de Mesa"
+  topos:       "Topos de Bolo",
+  tematica:    "Kit Festa",
+  afetiva:     "Papelaria Afetiva",
+  brindes:     "Brindes Personalizados",
+  centros:     "Centros de Mesa",
+  pegue_monte: "Pegue e Monte",
+  acetato:     "Caixas de Acetato",
+  convites:    "Convites",
+  pascoa:      "Páscoa"
 };
 
 const EMOJIS = {
-  topos:"🎉", tematica:"🎈", afetiva:"💖", brindes:"🎀", centros:"🌸"
+  topos:"🎉", tematica:"🎈", afetiva:"💖", brindes:"🎀", centros:"🌸",
+  pegue_monte:"📦", acetato:"🧊", convites:"✉️"
 };
 
 let categoriaAtiva     = "todas";
@@ -32,24 +37,32 @@ let produtoParaRemover = null;
 let modoEdicao         = null;
 let produtosCache      = {};
 
-// ─── AUTH ─────────────────────────────────────────────────────────────────
+// ─── Estado das imagens do formulário ─────────────────────
+let imagensForm = []; // array de strings (paths ou URLs)
+
+// ─── AUTH ─────────────────────────────────────────────────
 onAuthStateChanged(auth, (user) => {
   if (user) {
     document.getElementById("login-screen").style.display = "none";
-    document.getElementById("painel").style.display = "flex";
+    document.getElementById("painel").style.display       = "flex";
     iniciarPainel();
   } else {
-    document.getElementById("painel").style.display = "none";
+    document.getElementById("painel").style.display       = "none";
     document.getElementById("login-screen").style.display = "flex";
   }
 });
 
 document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("senha-input").addEventListener("keydown", (e) => {
-    if (e.key === "Enter") fazerLogin();
-  });
-  document.getElementById("email-input").addEventListener("keydown", (e) => {
-    if (e.key === "Enter") document.getElementById("senha-input").focus();
+  document.getElementById("senha-input").addEventListener("keydown", e => { if (e.key === "Enter") fazerLogin(); });
+  document.getElementById("email-input").addEventListener("keydown", e => { if (e.key === "Enter") document.getElementById("senha-input").focus(); });
+
+  // Alternância do tipo de imagem nova
+  document.querySelectorAll('input[name="tipo-imagem-nova"]').forEach(radio => {
+    radio.addEventListener("change", () => {
+      const tipo = document.querySelector('input[name="tipo-imagem-nova"]:checked').value;
+      document.getElementById("input-imagem-arquivo").style.display = tipo === "arquivo" ? "block" : "none";
+      document.getElementById("input-imagem-url").style.display     = tipo === "url"     ? "block" : "none";
+    });
   });
 });
 
@@ -60,13 +73,12 @@ async function fazerLogin() {
   const btn   = document.getElementById("btn-login");
 
   if (!email || !senha) { erro.textContent = "Preencha o e-mail e a senha."; return; }
-
   btn.textContent = "Entrando...";
   btn.disabled = true;
 
   try {
     await signInWithEmailAndPassword(auth, email, senha);
-  } catch (e) {
+  } catch {
     erro.textContent = "E-mail ou senha incorretos.";
     btn.textContent = "Entrar";
     btn.disabled = false;
@@ -74,9 +86,7 @@ async function fazerLogin() {
   }
 }
 
-async function fazerLogout() {
-  await signOut(auth);
-}
+async function fazerLogout() { await signOut(auth); }
 
 document.getElementById("toggle-senha").addEventListener("click", () => {
   const input = document.getElementById("senha-input");
@@ -85,7 +95,7 @@ document.getElementById("toggle-senha").addEventListener("click", () => {
   else { input.type = "password"; icon.className = "fa fa-eye"; }
 });
 
-// ─── PAINEL ───────────────────────────────────────────────────────────────
+// ─── PAINEL ───────────────────────────────────────────────
 async function iniciarPainel() {
   construirTabs();
   await carregarProdutos();
@@ -94,15 +104,15 @@ async function iniciarPainel() {
 }
 
 function mostrarAba(aba) {
-  document.querySelectorAll(".aba").forEach((el) => { el.style.display = "none"; });
+  document.querySelectorAll(".aba").forEach(el => { el.style.display = "none"; });
   document.getElementById("aba-" + aba).style.display = "block";
-  document.querySelectorAll(".nav-btn").forEach((btn) => btn.classList.remove("active"));
+  document.querySelectorAll(".nav-btn").forEach(btn => btn.classList.remove("active"));
   event.currentTarget.classList.add("active");
   if (aba === "visitas")  atualizarStats();
   if (aba === "catalogo") renderProdutos();
 }
 
-// ─── FIRESTORE ────────────────────────────────────────────────────────────
+// ─── FIRESTORE ────────────────────────────────────────────
 async function carregarProdutos() {
   produtosCache = {};
   Object.keys(NOMES_CATEGORIAS).forEach(cat => { produtosCache[cat] = []; });
@@ -114,12 +124,12 @@ async function carregarProdutos() {
         produtosCache[p.categoria].push({ ...p, firestoreId: docSnap.id });
       }
     });
-  } catch (e) {
+  } catch {
     mostrarToastAdmin("Erro ao carregar produtos.", true);
   }
 }
 
-// ─── TABS ─────────────────────────────────────────────────────────────────
+// ─── TABS ─────────────────────────────────────────────────
 function construirTabs() {
   const container = document.getElementById("categoria-tabs");
   container.innerHTML = "";
@@ -144,7 +154,7 @@ function filtrarCategoria(cat, btn) {
   renderProdutos();
 }
 
-// ─── RENDER ───────────────────────────────────────────────────────────────
+// ─── RENDER ───────────────────────────────────────────────
 function renderProdutos() {
   const grid = document.getElementById("produtos-admin-grid");
   grid.innerHTML = "";
@@ -156,52 +166,90 @@ function renderProdutos() {
     (produtosCache[cat] || []).forEach(produto => {
       encontrou = true;
       total++;
+
+      // Suporte a múltiplas imagens e campo legado
+      const imgs = produto.imagens && produto.imagens.length > 0
+        ? produto.imagens
+        : produto.imagem ? [produto.imagem] : [];
+      const capa = imgs[0] || "https://placehold.co/280x160/fce4ec/D96C8A?text=Sem+imagem";
+
       const card = document.createElement("div");
       card.className = "produto-admin-card";
       card.innerHTML =
-        '<img src="' + produto.imagem + '" alt="' + produto.nome + '" onerror="this.src=\'https://placehold.co/280x160/fce4ec/D96C8A?text=Sem+imagem\'">' +
+        '<img src="' + capa + '" alt="' + produto.nome + '" onerror="this.src=\'https://placehold.co/280x160/fce4ec/D96C8A?text=Sem+imagem\'">' +
         '<div class="produto-admin-info">' +
           '<h4>' + produto.nome + '</h4>' +
           '<div class="preco-admin">R$ ' + Number(produto.preco).toFixed(2) + '</div>' +
           '<p class="desc-admin">' + produto.descricao + '</p>' +
           '<span class="cat-label">' + EMOJIS[cat] + ' ' + NOMES_CATEGORIAS[cat] + '</span>' +
+          (imgs.length > 1 ? '<span class="img-count">📷 ' + imgs.length + ' fotos</span>' : '') +
         '</div>' +
         '<div class="produto-admin-actions">' +
-          '<button class="btn-editar" onclick="editarProduto(\'' + produto.firestoreId + '\')">Editar</button>' +
-          '<button class="btn-remover" onclick="pedirRemocao(\'' + produto.firestoreId + '\', \'' + produto.nome.replace(/'/g, "\\'") + '\')">Remover</button>' +
+          '<button class="btn-editar" onclick="editarProduto(\'' + produto.firestoreId + '\')">✏️ Editar</button>' +
+          '<button class="btn-remover" onclick="pedirRemocao(\'' + produto.firestoreId + '\', \'' + produto.nome.replace(/'/g, "\\'") + '\')">🗑️ Remover</button>' +
         '</div>';
       grid.appendChild(card);
     });
   });
 
   if (!encontrou) {
-    grid.innerHTML = '<div class="vazio-msg">Nenhum produto ainda.<br>Va em <strong>Adicionar Produto</strong> para comecar!</div>';
+    grid.innerHTML = '<div class="vazio-msg">Nenhum produto ainda.<br>Vá em <strong>Adicionar Produto</strong> para começar!</div>';
   }
   document.getElementById("total-produtos-badge").textContent = total + " produto" + (total !== 1 ? "s" : "");
 }
 
-// ─── TIPO DE IMAGEM ───────────────────────────────────────────────────────
-function alternarTipoImagem(tipo) {
-  document.getElementById("input-arquivo").style.display = tipo === "arquivo" ? "block" : "none";
-  document.getElementById("input-url").style.display     = tipo === "url"     ? "block" : "none";
-  document.getElementById("preview-imagem").style.display = "none";
+// ─── MÚLTIPLAS IMAGENS ────────────────────────────────────
+function renderImagensForm() {
+  const lista = document.getElementById("imagens-lista");
+  lista.innerHTML = "";
+
+  imagensForm.forEach((src, i) => {
+    const item = document.createElement("div");
+    item.className = "imagem-item";
+    item.innerHTML =
+      '<img class="imagem-item-thumb" src="' + src + '" onerror="this.src=\'https://placehold.co/48x48/fce4ec/D96C8A?text=?\'">' +
+      '<div class="imagem-item-info">' +
+        '<span class="imagem-item-url">' + src + '</span>' +
+        (i === 0 ? '<span class="imagem-item-capa">⭐ Capa</span>' : '') +
+      '</div>' +
+      '<div class="imagem-item-actions">' +
+        (i > 0 ? '<button class="btn-img-up" title="Mover para cima" onclick="moverImagem(' + i + ',-1)">↑</button>' : '') +
+        (i < imagensForm.length - 1 ? '<button class="btn-img-down" title="Mover para baixo" onclick="moverImagem(' + i + ',1)">↓</button>' : '') +
+        '<button class="btn-img-remove" title="Remover" onclick="removerImagem(' + i + ')">✕</button>' +
+      '</div>';
+    lista.appendChild(item);
+  });
 }
 
-function previewImagem() {
-  const tipoChecked = document.querySelector('input[name="tipo-imagem"]:checked');
-  const tipo = tipoChecked ? tipoChecked.value : "arquivo";
-  const src  = tipo === "arquivo"
-    ? document.getElementById("form-imagem-arquivo").value.trim()
-    : document.getElementById("form-imagem-url").value.trim();
+function adicionarImagem() {
+  const tipo = document.querySelector('input[name="tipo-imagem-nova"]:checked').value;
+  const inputEl = tipo === "arquivo"
+    ? document.getElementById("nova-imagem-arquivo")
+    : document.getElementById("nova-imagem-url");
+  const src = inputEl.value.trim();
+
   if (!src) { mostrarToastAdmin("Informe o caminho ou URL da imagem.", true); return; }
-  const preview = document.getElementById("preview-imagem");
-  const img     = document.getElementById("preview-img");
-  img.src = src;
-  preview.style.display = "block";
-  img.onerror = () => { preview.style.display = "none"; mostrarToastAdmin("Imagem não encontrada.", true); };
+  if (imagensForm.length >= 10) { mostrarToastAdmin("Máximo de 10 imagens por produto.", true); return; }
+  if (imagensForm.includes(src)) { mostrarToastAdmin("Essa imagem já foi adicionada.", true); return; }
+
+  imagensForm.push(src);
+  inputEl.value = "";
+  renderImagensForm();
 }
 
-// ─── SALVAR ───────────────────────────────────────────────────────────────
+function removerImagem(idx) {
+  imagensForm.splice(idx, 1);
+  renderImagensForm();
+}
+
+function moverImagem(idx, dir) {
+  const novo = idx + dir;
+  if (novo < 0 || novo >= imagensForm.length) return;
+  [imagensForm[idx], imagensForm[novo]] = [imagensForm[novo], imagensForm[idx]];
+  renderImagensForm();
+}
+
+// ─── SALVAR ───────────────────────────────────────────────
 async function salvarProduto() {
   const categoria = document.getElementById("form-categoria").value;
   const nome      = document.getElementById("form-nome").value.trim();
@@ -209,14 +257,15 @@ async function salvarProduto() {
   const preco     = parseFloat(document.getElementById("form-preco").value);
   const msgEl     = document.getElementById("form-msg");
 
-  const tipoChecked = document.querySelector('input[name="tipo-imagem"]:checked');
-  const tipo = tipoChecked ? tipoChecked.value : "arquivo";
-  const imagem = tipo === "arquivo"
-    ? document.getElementById("form-imagem-arquivo").value.trim()
-    : document.getElementById("form-imagem-url").value.trim();
-
-  if (!nome || !descricao || isNaN(preco) || preco <= 0 || !imagem) {
+  if (!nome || !descricao || isNaN(preco) || preco <= 0) {
     msgEl.textContent = "Preencha todos os campos obrigatórios.";
+    msgEl.className = "form-msg erro";
+    setTimeout(() => { msgEl.textContent = ""; }, 3000);
+    return;
+  }
+
+  if (imagensForm.length === 0) {
+    msgEl.textContent = "Adicione pelo menos uma imagem.";
     msgEl.className = "form-msg erro";
     setTimeout(() => { msgEl.textContent = ""; }, 3000);
     return;
@@ -228,7 +277,12 @@ async function salvarProduto() {
 
   try {
     const firestoreId = modoEdicao ? modoEdicao : Date.now().toString();
-    await setDoc(doc(db, "produtos", firestoreId), { nome, descricao, preco, imagem, categoria });
+    const dadosProduto = {
+      nome, descricao, preco, categoria,
+      imagens: imagensForm,
+      imagem:  imagensForm[0]  // campo legado para retrocompatibilidade
+    };
+    await setDoc(doc(db, "produtos", firestoreId), dadosProduto);
     msgEl.textContent = modoEdicao ? "Produto atualizado!" : "Produto adicionado!";
     msgEl.className = "form-msg sucesso";
     setTimeout(() => { msgEl.textContent = ""; }, 3000);
@@ -237,7 +291,7 @@ async function salvarProduto() {
     await carregarProdutos();
     renderProdutos();
     mostrarToastAdmin("Produto salvo com sucesso! ✅");
-  } catch (e) {
+  } catch {
     msgEl.textContent = "Erro ao salvar. Tente novamente.";
     msgEl.className = "form-msg erro";
     mostrarToastAdmin("Erro ao salvar produto.", true);
@@ -247,7 +301,7 @@ async function salvarProduto() {
   btnSalvar.disabled = false;
 }
 
-// ─── EDITAR ───────────────────────────────────────────────────────────────
+// ─── EDITAR ───────────────────────────────────────────────
 function editarProduto(firestoreId) {
   let produto = null;
   Object.values(produtosCache).flat().forEach(p => { if (p.firestoreId === firestoreId) produto = p; });
@@ -263,21 +317,11 @@ function editarProduto(firestoreId) {
   document.getElementById("form-descricao").value   = produto.descricao;
   document.getElementById("form-preco").value        = produto.preco;
 
-  const isUrl = produto.imagem.startsWith("http");
-  if (isUrl) {
-    document.querySelector('input[name="tipo-imagem"][value="url"]').checked = true;
-    alternarTipoImagem("url");
-    document.getElementById("form-imagem-url").value = produto.imagem;
-  } else {
-    document.querySelector('input[name="tipo-imagem"][value="arquivo"]').checked = true;
-    alternarTipoImagem("arquivo");
-    document.getElementById("form-imagem-arquivo").value = produto.imagem;
-  }
-
-  const preview = document.getElementById("preview-imagem");
-  const imgEl   = document.getElementById("preview-img");
-  imgEl.src = produto.imagem;
-  preview.style.display = "block";
+  // Carrega imagens existentes (suporte a array e campo legado)
+  imagensForm = produto.imagens && produto.imagens.length > 0
+    ? [...produto.imagens]
+    : produto.imagem ? [produto.imagem] : [];
+  renderImagensForm();
 
   modoEdicao = firestoreId;
   document.querySelector(".btn-salvar").innerHTML = '<i class="fa fa-check"></i> Atualizar Produto';
@@ -287,22 +331,24 @@ function editarProduto(firestoreId) {
 }
 
 function limparFormulario() {
-  document.getElementById("form-nome").value = "";
+  document.getElementById("form-nome").value      = "";
   document.getElementById("form-descricao").value = "";
-  document.getElementById("form-preco").value = "";
-  document.getElementById("form-imagem-arquivo").value = "";
-  document.getElementById("form-imagem-url").value = "";
-  document.getElementById("preview-imagem").style.display = "none";
-  document.getElementById("form-msg").textContent = "";
+  document.getElementById("form-preco").value      = "";
+  document.getElementById("nova-imagem-arquivo").value = "";
+  document.getElementById("nova-imagem-url").value     = "";
+  document.getElementById("form-msg").textContent  = "";
+  imagensForm = [];
+  renderImagensForm();
   modoEdicao = null;
-  document.querySelector('input[name="tipo-imagem"][value="arquivo"]').checked = true;
-  alternarTipoImagem("arquivo");
+  document.querySelector('input[name="tipo-imagem-nova"][value="arquivo"]').checked = true;
+  document.getElementById("input-imagem-arquivo").style.display = "block";
+  document.getElementById("input-imagem-url").style.display     = "none";
   document.querySelector(".btn-salvar").innerHTML = '<i class="fa fa-check"></i> Salvar Produto';
   const h2 = document.querySelector("#aba-adicionar .page-header h2");
   if (h2) h2.textContent = "➕ Adicionar Produto";
 }
 
-// ─── REMOVER ──────────────────────────────────────────────────────────────
+// ─── REMOVER ──────────────────────────────────────────────
 function pedirRemocao(firestoreId, nome) {
   produtoParaRemover = firestoreId;
   document.getElementById("modal-nome-produto").textContent = nome;
@@ -322,13 +368,13 @@ async function confirmarRemocao() {
     await carregarProdutos();
     renderProdutos();
     mostrarToastAdmin("Produto removido!");
-  } catch (e) {
+  } catch {
     mostrarToastAdmin("Erro ao remover.", true);
     cancelarRemocao();
   }
 }
 
-// ─── STATS ────────────────────────────────────────────────────────────────
+// ─── STATS ────────────────────────────────────────────────
 function atualizarStats() {
   const visitas = parseInt(localStorage.getItem("contadorVisitas") || "0");
   const total   = Object.values(produtosCache).flat().length;
@@ -345,7 +391,7 @@ function resetarVisitas() {
   }
 }
 
-// ─── TOAST ────────────────────────────────────────────────────────────────
+// ─── TOAST ────────────────────────────────────────────────
 function mostrarToastAdmin(msg, isErro) {
   const toast = document.getElementById("toast-admin");
   toast.textContent = msg;
@@ -353,16 +399,18 @@ function mostrarToastAdmin(msg, isErro) {
   setTimeout(() => { toast.className = ""; }, 2500);
 }
 
-window.fazerLogin         = fazerLogin;
-window.fazerLogout        = fazerLogout;
-window.mostrarAba         = mostrarAba;
-window.filtrarCategoria   = filtrarCategoria;
-window.salvarProduto      = salvarProduto;
-window.editarProduto      = editarProduto;
-window.limparFormulario   = limparFormulario;
-window.alternarTipoImagem = alternarTipoImagem;
-window.previewImagem      = previewImagem;
-window.pedirRemocao       = pedirRemocao;
-window.cancelarRemocao    = cancelarRemocao;
-window.confirmarRemocao   = confirmarRemocao;
-window.resetarVisitas     = resetarVisitas;
+// ─── EXPORTS ──────────────────────────────────────────────
+window.fazerLogin       = fazerLogin;
+window.fazerLogout      = fazerLogout;
+window.mostrarAba       = mostrarAba;
+window.filtrarCategoria = filtrarCategoria;
+window.salvarProduto    = salvarProduto;
+window.editarProduto    = editarProduto;
+window.limparFormulario = limparFormulario;
+window.pedirRemocao     = pedirRemocao;
+window.cancelarRemocao  = cancelarRemocao;
+window.confirmarRemocao = confirmarRemocao;
+window.resetarVisitas   = resetarVisitas;
+window.adicionarImagem  = adicionarImagem;
+window.removerImagem    = removerImagem;
+window.moverImagem      = moverImagem;

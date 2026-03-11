@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
   <meta charset="UTF-8">
   <title>Admin | Dominique Personalizados</title>
@@ -9,14 +8,12 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="admin.css">
 </head>
-
 <body>
 
   <!-- ===== LOGIN ===== -->
   <div id="login-screen">
     <div class="login-card">
       <div class="login-logo">
-        <!-- Troque o src abaixo pela foto ou logo desejada -->
         <img id="logo-admin-img" src="./img/mascote.png" alt="Logo"
           onerror="this.style.display='none'; document.getElementById('logo-admin-emoji').style.display='block'">
         <span id="logo-admin-emoji" style="display:none; font-size:48px;">🌸</span>
@@ -29,13 +26,11 @@
           <input type="email" id="email-input" placeholder="seu@email.com" autocomplete="email">
           <span class="input-icon"><i class="fa fa-envelope"></i></span>
         </div>
-
         <label>Senha</label>
         <div class="input-group">
           <input type="password" id="senha-input" placeholder="Sua senha" autocomplete="current-password">
           <button id="toggle-senha" type="button"><i class="fa fa-eye"></i></button>
         </div>
-
         <button id="btn-login" onclick="fazerLogin()">Entrar</button>
         <p id="login-erro" class="erro-msg"></p>
       </div>
@@ -47,11 +42,10 @@
 
     <aside class="sidebar">
       <div class="sidebar-logo">
-        <!-- Troque o src abaixo pela foto ou logo desejada -->
         <img id="sidebar-logo-img" src="./img/mascote.png" alt="Logo"
           onerror="this.style.display='none'; document.getElementById('sidebar-logo-emoji').style.display='block'"
-          style="width:42px; height:42px; border-radius:50%; object-fit:cover; border:2px solid #fce4ec;">
-        <span id="sidebar-logo-emoji" style="display:none; font-size:28px;">🌸</span>
+          style="width:42px;height:42px;border-radius:50%;object-fit:cover;border:2px solid #fce4ec;">
+        <span id="sidebar-logo-emoji" style="display:none;font-size:28px;">🌸</span>
         <div>
           <strong>Dominique</strong>
           <small>Administrador</small>
@@ -110,6 +104,10 @@
                 <option value="afetiva">💖 Papelaria Afetiva</option>
                 <option value="brindes">🎀 Brindes Personalizados</option>
                 <option value="centros">🌸 Centros de Mesa</option>
+                <option value="pegue_monte">📦 Pegue e Monte</option>
+                <option value="acetato">🧊 Caixas de Acetato</option>
+                <option value="convites">✉️ Convites</option>
+                <option value="pascoa">🐣 Páscoa</option>
               </select>
             </div>
             <div class="form-group">
@@ -129,40 +127,36 @@
               placeholder="Descreva o produto, quantidade do kit, medidas, etc."></textarea>
           </div>
 
-          <!-- IMAGEM -->
+          <!-- IMAGENS (múltiplas) -->
           <div class="form-group">
-            <label>Imagem do Produto *</label>
+            <label>Imagens do Produto *</label>
+            <small class="imagens-hint">Adicione até 10 imagens. A primeira será a capa. Arraste para reordenar.</small>
 
-            <div class="imagem-opcoes">
-              <label class="radio-label">
-                <input type="radio" name="tipo-imagem" value="arquivo" checked
-                  onchange="alternarTipoImagem(this.value)">
-                📁 Pasta img/
-              </label>
-              <label class="radio-label">
-                <input type="radio" name="tipo-imagem" value="url" onchange="alternarTipoImagem(this.value)">
-                🔗 URL externa
-              </label>
+            <div id="imagens-lista" class="imagens-lista"></div>
+
+            <div class="imagem-adicionar-row">
+              <div class="imagem-opcoes">
+                <label class="radio-label">
+                  <input type="radio" name="tipo-imagem-nova" value="arquivo" checked> 📁 Pasta img/
+                </label>
+                <label class="radio-label">
+                  <input type="radio" name="tipo-imagem-nova" value="url"> 🔗 URL externa
+                </label>
+              </div>
+
+              <div id="input-imagem-arquivo">
+                <input type="text" id="nova-imagem-arquivo" placeholder="img/nome-do-arquivo.jpg">
+              </div>
+              <div id="input-imagem-url" style="display:none">
+                <input type="text" id="nova-imagem-url" placeholder="https://exemplo.com/imagem.jpg">
+              </div>
+
+              <button type="button" class="btn-adicionar-imagem" onclick="adicionarImagem()">
+                <i class="fa fa-plus"></i> Adicionar imagem
+              </button>
             </div>
 
-            <!-- Caminho local img/ -->
-            <div id="input-arquivo">
-              <input type="text" id="form-imagem-arquivo" placeholder="img/nome-do-arquivo.jpg">
-              <small>💡 Salve a imagem na pasta <code>img/</code> do projeto e informe o nome aqui.</small>
-            </div>
-
-            <!-- URL externa -->
-            <div id="input-url" style="display:none">
-              <input type="text" id="form-imagem-url" placeholder="https://exemplo.com/imagem.jpg">
-            </div>
-
-            <!-- Preview -->
-            <div id="preview-imagem" class="preview-imagem" style="display:none">
-              <img id="preview-img" src="" alt="Preview">
-            </div>
-            <button type="button" class="btn-preview" onclick="previewImagem()">
-              👁️ Visualizar imagem
-            </button>
+            <small>💡 Pasta img/: salve o arquivo na pasta <code>img/</code> do projeto e informe o nome.</small>
           </div>
 
           <div class="form-actions">
@@ -199,7 +193,7 @@
           <div class="stat-card">
             <span class="stat-icon">🗂️</span>
             <div>
-              <strong>5</strong>
+              <strong>9</strong>
               <small>Categorias ativas</small>
             </div>
           </div>
@@ -229,5 +223,4 @@
 
   <script type="module" src="admin.js"></script>
 </body>
-
 </html>

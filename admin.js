@@ -55,15 +55,8 @@ onAuthStateChanged(auth, (user) => {
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("senha-input").addEventListener("keydown", e => { if (e.key === "Enter") fazerLogin(); });
   document.getElementById("email-input").addEventListener("keydown", e => { if (e.key === "Enter") document.getElementById("senha-input").focus(); });
-
-  // Alternância do tipo de imagem nova
-  document.querySelectorAll('input[name="tipo-imagem-nova"]').forEach(radio => {
-    radio.addEventListener("change", () => {
-      const tipo = document.querySelector('input[name="tipo-imagem-nova"]:checked').value;
-      document.getElementById("input-imagem-arquivo").style.display = tipo === "arquivo" ? "block" : "none";
-      document.getElementById("input-imagem-url").style.display     = tipo === "url"     ? "block" : "none";
-    });
-  });
+  // Inicia com upload visível e botão oculto
+  alternarTipoImagemNova("upload");
 });
 
 async function fazerLogin() {
@@ -198,6 +191,90 @@ function renderProdutos() {
   document.getElementById("total-produtos-badge").textContent = total + " produto" + (total !== 1 ? "s" : "");
 }
 
+// ─── TIPO DE IMAGEM ───────────────────────────────────────
+function alternarTipoImagemNova(tipo) {
+  document.getElementById("input-imagem-upload").style.display  = tipo === "upload"  ? "block" : "none";
+  document.getElementById("input-imagem-url").style.display     = tipo === "url"     ? "block" : "none";
+  document.getElementById("input-imagem-arquivo").style.display = tipo === "arquivo" ? "block" : "none";
+  document.getElementById("btn-add-imagem").style.display       = tipo !== "upload"  ? "flex"  : "none";
+}
+
+// ─── UPLOAD DO COMPUTADOR ─────────────────────────────────
+async function processarUpload(input) {
+  const files = Array.from(input.files);
+  if (!files.length) return;
+
+  const progressDiv  = document.getElementById("upload-progress");
+  const progressFill = document.getElementById("progresso-fill");
+  const progressText = document.getElementById("progresso-texto");
+  const labelText    = document.getElementById("upload-label-text");
+
+  progressDiv.style.display = "block";
+  let processados = 0;
+
+  for (const file of files) {
+    if (imagensForm.length >= 10) {
+      mostrarToastAdmin("Máximo de 10 imagens atingido.", true);
+      break;
+    }
+
+    progressText.textContent = "Processando " + file.name + "...";
+
+    try {
+      const base64 = await comprimirImagem(file, 900, 0.78);
+      imagensForm.push(base64);
+      processados++;
+      progressFill.style.width = Math.round((processados / files.length) * 100) + "%";
+    } catch {
+      mostrarToastAdmin("Erro ao processar " + file.name, true);
+    }
+  }
+
+  progressDiv.style.display = "none";
+  progressFill.style.width  = "0%";
+  labelText.textContent = "Clique para escolher uma imagem";
+  input.value = "";
+  renderImagensForm();
+
+  if (processados > 0) {
+    mostrarToastAdmin(processados + " imagem" + (processados > 1 ? "ns" : "") + " adicionada" + (processados > 1 ? "s" : "") + "! ✅");
+  }
+}
+
+function comprimirImagem(file, maxPx, qualidade) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        let w = img.width, h = img.height;
+        if (w > maxPx || h > maxPx) {
+          if (w > h) { h = Math.round(h * maxPx / w); w = maxPx; }
+          else       { w = Math.round(w * maxPx / h); h = maxPx; }
+        }
+        canvas.width  = w;
+        canvas.height = h;
+        canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL("image/jpeg", qualidade));
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// ─── CONVERTER LINK DO GOOGLE DRIVE ──────────────────────
+function converterLinkGoogleDrive(url) {
+  // Formato: /file/d/ID/view  →  uc?export=view&id=ID
+  const match = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if (match) return "https://drive.google.com/uc?export=view&id=" + match[1];
+  // Já está no formato direto
+  return url;
+}
+
 // ─── MÚLTIPLAS IMAGENS ────────────────────────────────────
 function renderImagensForm() {
   const lista = document.getElementById("imagens-lista");
@@ -223,17 +300,22 @@ function renderImagensForm() {
 
 function adicionarImagem() {
   const tipo = document.querySelector('input[name="tipo-imagem-nova"]:checked').value;
-  const inputEl = tipo === "arquivo"
-    ? document.getElementById("nova-imagem-arquivo")
-    : document.getElementById("nova-imagem-url");
-  const src = inputEl.value.trim();
+  let src = "";
+
+  if (tipo === "url") {
+    src = document.getElementById("nova-imagem-url").value.trim();
+    src = converterLinkGoogleDrive(src); // converte Drive automaticamente
+  } else if (tipo === "arquivo") {
+    src = document.getElementById("nova-imagem-arquivo").value.trim();
+  }
 
   if (!src) { mostrarToastAdmin("Informe o caminho ou URL da imagem.", true); return; }
   if (imagensForm.length >= 10) { mostrarToastAdmin("Máximo de 10 imagens por produto.", true); return; }
   if (imagensForm.includes(src)) { mostrarToastAdmin("Essa imagem já foi adicionada.", true); return; }
 
   imagensForm.push(src);
-  inputEl.value = "";
+  if (tipo === "url")     document.getElementById("nova-imagem-url").value     = "";
+  if (tipo === "arquivo") document.getElementById("nova-imagem-arquivo").value = "";
   renderImagensForm();
 }
 
@@ -340,9 +422,8 @@ function limparFormulario() {
   imagensForm = [];
   renderImagensForm();
   modoEdicao = null;
-  document.querySelector('input[name="tipo-imagem-nova"][value="arquivo"]').checked = true;
-  document.getElementById("input-imagem-arquivo").style.display = "block";
-  document.getElementById("input-imagem-url").style.display     = "none";
+  document.querySelector('input[name="tipo-imagem-nova"][value="upload"]').checked = true;
+  alternarTipoImagemNova("upload");
   document.querySelector(".btn-salvar").innerHTML = '<i class="fa fa-check"></i> Salvar Produto';
   const h2 = document.querySelector("#aba-adicionar .page-header h2");
   if (h2) h2.textContent = "➕ Adicionar Produto";
@@ -400,17 +481,19 @@ function mostrarToastAdmin(msg, isErro) {
 }
 
 // ─── EXPORTS ──────────────────────────────────────────────
-window.fazerLogin       = fazerLogin;
-window.fazerLogout      = fazerLogout;
-window.mostrarAba       = mostrarAba;
-window.filtrarCategoria = filtrarCategoria;
-window.salvarProduto    = salvarProduto;
-window.editarProduto    = editarProduto;
-window.limparFormulario = limparFormulario;
-window.pedirRemocao     = pedirRemocao;
-window.cancelarRemocao  = cancelarRemocao;
-window.confirmarRemocao = confirmarRemocao;
-window.resetarVisitas   = resetarVisitas;
-window.adicionarImagem  = adicionarImagem;
-window.removerImagem    = removerImagem;
-window.moverImagem      = moverImagem;
+window.fazerLogin         = fazerLogin;
+window.fazerLogout        = fazerLogout;
+window.mostrarAba         = mostrarAba;
+window.filtrarCategoria   = filtrarCategoria;
+window.salvarProduto      = salvarProduto;
+window.editarProduto      = editarProduto;
+window.limparFormulario   = limparFormulario;
+window.pedirRemocao       = pedirRemocao;
+window.cancelarRemocao    = cancelarRemocao;
+window.confirmarRemocao   = confirmarRemocao;
+window.resetarVisitas     = resetarVisitas;
+window.adicionarImagem    = adicionarImagem;
+window.removerImagem      = removerImagem;
+window.moverImagem        = moverImagem;
+window.processarUpload    = processarUpload;
+window.alternarTipoImagemNova = alternarTipoImagemNova;

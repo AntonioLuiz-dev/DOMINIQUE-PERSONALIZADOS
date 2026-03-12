@@ -137,26 +137,50 @@
             <div class="imagem-adicionar-row">
               <div class="imagem-opcoes">
                 <label class="radio-label">
-                  <input type="radio" name="tipo-imagem-nova" value="arquivo" checked> 📁 Pasta img/
+                  <input type="radio" name="tipo-imagem-nova" value="upload" checked
+                    onchange="alternarTipoImagemNova(this.value)"> 📤 Upload do computador
                 </label>
                 <label class="radio-label">
-                  <input type="radio" name="tipo-imagem-nova" value="url"> 🔗 URL externa
+                  <input type="radio" name="tipo-imagem-nova" value="url"
+                    onchange="alternarTipoImagemNova(this.value)"> 🔗 URL / Google Drive
+                </label>
+                <label class="radio-label">
+                  <input type="radio" name="tipo-imagem-nova" value="arquivo"
+                    onchange="alternarTipoImagemNova(this.value)"> 📁 Pasta img/
                 </label>
               </div>
 
-              <div id="input-imagem-arquivo">
-                <input type="text" id="nova-imagem-arquivo" placeholder="img/nome-do-arquivo.jpg">
-              </div>
-              <div id="input-imagem-url" style="display:none">
-                <input type="text" id="nova-imagem-url" placeholder="https://exemplo.com/imagem.jpg">
+              <!-- Upload do computador -->
+              <div id="input-imagem-upload">
+                <label class="upload-area-btn" for="input-file-upload">
+                  <i class="fa fa-cloud-upload-alt"></i>
+                  <span id="upload-label-text">Clique para escolher uma imagem</span>
+                </label>
+                <input type="file" id="input-file-upload" accept="image/*" multiple style="display:none"
+                  onchange="processarUpload(this)">
+                <div id="upload-progress" style="display:none">
+                  <div class="progresso-bar"><div class="progresso-fill" id="progresso-fill"></div></div>
+                  <small id="progresso-texto"></small>
+                </div>
               </div>
 
-              <button type="button" class="btn-adicionar-imagem" onclick="adicionarImagem()">
+              <!-- URL externa / Google Drive -->
+              <div id="input-imagem-url" style="display:none">
+                <input type="text" id="nova-imagem-url" placeholder="https://... ou link do Google Drive">
+                <small class="drive-hint">💡 Google Drive: abra a imagem, clique em <strong>Compartilhar → Qualquer pessoa com o link</strong>, depois cole o link aqui — ele será convertido automaticamente.</small>
+              </div>
+
+              <!-- Pasta img/ -->
+              <div id="input-imagem-arquivo" style="display:none">
+                <input type="text" id="nova-imagem-arquivo" placeholder="img/nome-do-arquivo.jpg">
+                <small>Salve o arquivo na pasta <code>img/</code> do projeto e informe o nome.</small>
+              </div>
+
+              <button type="button" class="btn-adicionar-imagem" id="btn-add-imagem"
+                onclick="adicionarImagem()" style="display:none">
                 <i class="fa fa-plus"></i> Adicionar imagem
               </button>
             </div>
-
-            <small>💡 Pasta img/: salve o arquivo na pasta <code>img/</code> do projeto e informe o nome.</small>
           </div>
 
           <div class="form-actions">
